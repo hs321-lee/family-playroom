@@ -170,6 +170,8 @@ canvas { display:block; width:100%; height:auto; background:#fff; border:2px das
 .memory-card { min-height:clamp(60px,14vw,100px); border:2px solid #cebef1; border-radius:13px; background:#ede3ff; color:#5c408d; font-weight:850; font-size:clamp(1.6rem,5vw,3rem); }
 .memory-card.open { background:#fff8e8; border-color:#e9c777; }
 .memory-card.matched { background:#e2f4e8; border-color:#7db592; color:#285d41; opacity:1; }
+.memory-board.preview .memory-card { opacity:1; }
+.memory-progress { margin:12px 0 0; text-align:center; color:#514178; font-size:.94rem; font-weight:800; }
 .puzzle-caption { margin:0; }
 .trace-reward { display:flex; align-items:center; justify-content:center; gap:10px; margin:9px 0 0; font-weight:800; }
 .trace-reward:not([hidden]) { animation:trace-pop .7s both; }
@@ -251,7 +253,7 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
     <a class="jump" href="#numbers"><span class="jump-icon" aria-hidden="true">123</span><h3>숫자놀이</h3><p class="small">그림을 세고 빠진 숫자를 찾아요.</p></a>
     <a class="jump" href="#english"><span class="jump-icon" aria-hidden="true">ABC</span><h3>영어놀이</h3><p class="small">알파벳과 그림 단어를 맞혀요.</p></a>
     <a class="jump" href="#art"><span class="jump-icon" aria-hidden="true">✿</span><h3>미술놀이</h3><p class="small">그림을 그리고 색칠과 스티커로 꾸며요.</p></a>
-    <a class="jump" href="#puzzle"><span class="jump-icon" aria-hidden="true">▧</span><h3>퍼즐놀이</h3><p class="small">그림 조각과 동물 카드의 짝을 맞혀요.</p></a>
+    <a class="jump" href="#puzzle"><span class="jump-icon" aria-hidden="true">▧</span><h3>퍼즐놀이</h3><p class="small">그림 퍼즐과 메모리 카드로 놀아요.</p></a>
     <a class="jump" href="#family"><span class="jump-icon" aria-hidden="true">▦</span><h3>가족 대시보드</h3><p class="small">우리 일정과 주말 나들이를 모아봐요.</p></a>
     <a class="jump" href="#routine"><span class="jump-icon" aria-hidden="true">★</span><h3>오늘 할 일</h3><p class="small">아침·저녁 할 일을 하고 스티커를 받아요.</p></a>
     <a class="jump" href="#ebs"><span class="jump-icon" aria-hidden="true">▶</span><h3>EBS 영상</h3><p class="small">한글·수학·영어 영상을 골라 봐요.</p></a>
@@ -376,7 +378,7 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
 <section id="puzzle" hidden>
   <div class="section-head">
     <h1 class="page-title" tabindex="-1">퍼즐놀이</h1>
-    <div class="row"><span class="game-stars" id="puzzle-stars"></span><button class="button" id="picture-mode" type="button" aria-pressed="true">그림 퍼즐</button><button class="button" id="memory-mode" type="button" aria-pressed="false">동물 짝 찾기</button></div>
+    <div class="row"><span class="game-stars" id="puzzle-stars"></span><button class="button" id="picture-mode" type="button" aria-pressed="true">그림 퍼즐</button><button class="button" id="memory-mode" type="button" aria-pressed="false">메모리 카드</button></div>
   </div>
   <div class="panel puzzle-panel" id="picture-puzzle">
     <h2>그림 맞추기</h2><p class="small puzzle-caption">조각 두 개를 차례로 눌러 자리를 바꿔요.</p>
@@ -392,12 +394,14 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
     <p class="feedback" id="picture-status" role="status"></p>
   </div>
   <div class="panel puzzle-panel" id="memory-puzzle" hidden>
-    <h2>동물 짝 찾기</h2><p class="small puzzle-caption">카드 두 장을 뒤집어서 같은 동물을 찾아요.</p>
+    <h2>메모리 카드</h2><p class="small puzzle-caption">카드 두 장을 뒤집어 같은 짝을 찾아요.</p>
     <div class="row puzzle-settings">
+      <label class="field" for="memory-theme">카드 고르기</label><select id="memory-theme"></select>
       <button class="button" id="memory-easy" type="button" aria-pressed="true">3쌍</button><button class="button" id="memory-hard" type="button" aria-pressed="false">6쌍</button>
-      <button class="button" id="memory-restart" type="button">다시 섞기</button>
+      <button class="button" id="memory-preview" type="button" aria-pressed="false">카드 먼저 보기</button><button class="button" id="memory-restart" type="button">다시 섞기</button>
     </div>
     <div class="memory-board" id="memory-board" aria-label="뒤집기 카드"></div>
+    <p class="memory-progress" id="memory-progress"></p>
     <p class="feedback" id="memory-status" role="status"></p>
   </div>
 </section>
@@ -502,7 +506,7 @@ function button(label, onClick, className = 'button') {
 function showPage(focus) {
   const requested = location.hash.slice(1);
   const sections = ['home','art','puzzle','family','routine',...Object.keys(LEARNING_PAGES)];
-  const section = sections.includes(requested) ? requested : 'home';
+  const section = requested === 'memory' ? 'puzzle' : sections.includes(requested) ? requested : 'home';
   sections.forEach((key) => { $(key).hidden = section !== key; });
   document.querySelectorAll('nav a').forEach((link) => {
     const learningMenu = link.closest('#main-menu') && link.hash === '#hangul' && Boolean(LEARNING_PAGES[section]);
@@ -1589,26 +1593,46 @@ $('picture-restart').addEventListener('click',() => startPicture(pictureSide));
 $('puzzle-scene').addEventListener('change',() => startPicture(pictureSide));
 startPicture(2);
 
+const MEMORY_THEMES = [
+  {name:'동물',cards:ANIMALS},
+  {name:'과일',cards:[
+    {name:'사과',icon:'🍎'},{name:'바나나',icon:'🍌'},{name:'포도',icon:'🍇'},{name:'딸기',icon:'🍓'},
+    {name:'수박',icon:'🍉'},{name:'귤',icon:'🍊'},{name:'키위',icon:'🥝'},{name:'파인애플',icon:'🍍'}
+  ]},
+  {name:'탈것',cards:[
+    {name:'자동차',icon:'🚗'},{name:'기차',icon:'🚂'},{name:'버스',icon:'🚌'},{name:'비행기',icon:'✈️'},
+    {name:'배',icon:'🚢'},{name:'자전거',icon:'🚲'},{name:'트랙터',icon:'🚜'},{name:'로켓',icon:'🚀'}
+  ]},
+  {name:'숫자',cards:Array.from({length:8},(_,index) => ({name:'숫자 ' + (index + 1),icon:String(index + 1)}))}
+];
 let memoryPairs = 3;
 let memoryDeck = [];
 let memoryOpen = [];
 let memoryTimer;
+let memoryPreview = false;
 const memoryFound = new Set();
 function refreshMemory() {
-  const cards = $('memory-board').children;
+  const board = $('memory-board');
+  const cards = board.children;
+  board.classList.toggle('preview',memoryPreview);
   memoryDeck.forEach(({name,icon},index) => {
     const matched = memoryFound.has(index);
-    const open = matched || memoryOpen.includes(index);
+    const open = memoryPreview || matched || memoryOpen.includes(index);
     const card = cards[index];
     card.textContent = open ? icon : '✦';
     card.classList.toggle('open',open);
     card.classList.toggle('matched',matched);
     card.setAttribute('aria-label',open ? name + (matched ? ' 짝을 찾았어요' : '') : (index + 1) + '번 카드');
-    card.setAttribute('aria-disabled',matched);
+    card.setAttribute('aria-disabled',memoryPreview || matched);
   });
+  const preview = $('memory-preview');
+  preview.textContent = memoryPreview ? '카드 덮기' : '카드 먼저 보기';
+  preview.setAttribute('aria-pressed',memoryPreview);
+  preview.disabled = memoryOpen.length === 2 || memoryFound.size === memoryDeck.length;
+  $('memory-progress').textContent = '찾은 짝 ' + (memoryFound.size / 2) + ' / ' + memoryPairs;
 }
 function openMemoryCard(index) {
-  if (memoryOpen.length === 2 || memoryFound.has(index) || memoryOpen.includes(index)) return;
+  if (memoryPreview || memoryOpen.length === 2 || memoryFound.has(index) || memoryOpen.includes(index)) return;
   memoryOpen.push(index);
   if (memoryOpen.length === 2) {
     const [first,second] = memoryOpen;
@@ -1617,10 +1641,10 @@ function openMemoryCard(index) {
       memoryFound.add(second);
       memoryOpen = [];
       const complete = memoryFound.size === memoryDeck.length;
-      $('memory-status').textContent = complete ? '모든 짝을 찾았어요! ⭐' : '같은 동물을 찾았어요!';
+      $('memory-status').textContent = complete ? '모든 짝을 찾았어요! ⭐' : '같은 카드를 찾았어요!';
       if (complete) awardPlayerStar('puzzle');
     } else {
-      $('memory-status').textContent = '다른 동물이 나왔어요. 다시 골라봐요.';
+      $('memory-status').textContent = '다른 카드가 나왔어요. 다시 골라봐요.';
       memoryTimer = setTimeout(() => { memoryOpen = []; refreshMemory(); },1000);
     }
   } else {
@@ -1631,9 +1655,11 @@ function openMemoryCard(index) {
 function startMemory(pairs) {
   clearTimeout(memoryTimer);
   memoryPairs = pairs;
-  const animals = shuffled(ANIMALS).slice(0,pairs);
-  memoryDeck = shuffled([...animals,...animals]);
+  const theme = MEMORY_THEMES[Number($('memory-theme').value)];
+  const cards = shuffled(theme.cards).slice(0,pairs);
+  memoryDeck = shuffled([...cards,...cards]);
   memoryOpen = [];
+  memoryPreview = false;
   memoryFound.clear();
   const board = $('memory-board');
   board.style.setProperty('--memory-cols',pairs === 3 ? 3 : 4);
@@ -1649,12 +1675,24 @@ function showPuzzleMode(memory) {
   $('picture-mode').setAttribute('aria-pressed',!memory);
   $('memory-mode').setAttribute('aria-pressed',memory);
 }
-$('picture-mode').addEventListener('click',() => showPuzzleMode(false));
-$('memory-mode').addEventListener('click',() => showPuzzleMode(true));
+$('picture-mode').addEventListener('click',() => { location.hash = 'puzzle'; });
+$('memory-mode').addEventListener('click',() => { location.hash = 'memory'; });
+function showPuzzleRoute() {
+  if (location.hash === '#puzzle' || location.hash === '#memory') showPuzzleMode(location.hash === '#memory');
+}
+window.addEventListener('hashchange',showPuzzleRoute);
+MEMORY_THEMES.forEach(({name},index) => $('memory-theme').add(new Option(name,index)));
+$('memory-theme').addEventListener('change',() => startMemory(memoryPairs));
+$('memory-preview').addEventListener('click',() => {
+  memoryPreview = !memoryPreview;
+  $('memory-status').textContent = memoryPreview ? '카드를 보고 준비되면 덮어요.' : (memoryOpen.length ? '카드 한 장을 더 골라요.' : '');
+  refreshMemory();
+});
 $('memory-easy').addEventListener('click',() => startMemory(3));
 $('memory-hard').addEventListener('click',() => startMemory(6));
 $('memory-restart').addEventListener('click',() => startMemory(memoryPairs));
 startMemory(3);
+showPuzzleRoute();
 
 const TIME_ZONE = 'Asia/Seoul';
 const dateFormat = new Intl.DateTimeFormat('sv-SE',{timeZone:TIME_ZONE,year:'numeric',month:'2-digit',day:'2-digit'});
