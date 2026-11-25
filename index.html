@@ -87,7 +87,7 @@ p { line-height:1.65; }
 .player-settings .field input { width:min(240px,100%); }
 .quiz-prompt { font-size:1.35rem; margin:22px 0 5px; }
 .quiz-picture { display:grid; place-items:center; margin:0 auto 13px; min-height:119px; width:min(100%,250px); border-radius:19px; background:#fcf7eb; font-size:4rem; }
-.options { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:570px; margin:18px auto 4px; }
+.options { display:grid; grid-template-columns:repeat(var(--option-count,3),minmax(0,1fr)); gap:10px; max-width:570px; margin:18px auto 4px; }
 .option { padding:13px 5px; min-height:82px; border:2px solid #e5daff; border-radius:14px; background:#f8f3ff; font-size:clamp(1.34rem,5vw,2.24rem); font-weight:850; }
 .option.good { background:#dff5e8; border-color:#499f79; color:#20583d; opacity:1; }
 .option.retry { border-color:#c5755f; background:#fff0e8; }
@@ -99,6 +99,7 @@ p { line-height:1.65; }
 .thinking-tiles { display:grid; grid-template-columns:repeat(var(--tile-count),minmax(0,1fr)); gap:5px; width:100%; max-width:425px; }
 .thinking-tile { display:grid; place-items:center; min-height:44px; border-radius:10px; background:white; color:#7855ad; font-size:clamp(1.24rem,5.7vw,2.25rem); line-height:1; font-weight:850; }
 .thinking-tile.blank { background:#f2eaff; border:2px dashed #bda9e1; }
+.spelling-picture { display:block; font-size:2.25rem; line-height:1.15; margin-bottom:8px; }
 .position-tiles { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; width:min(100%,230px); }
 .position-tiles .thinking-tile { min-height:34px; font-size:1.65rem; }
 .feedback { min-height:30px; margin:13px 0 5px; font-weight:700; }
@@ -176,7 +177,7 @@ canvas { display:block; width:100%; height:auto; background:#fff; border:2px das
 .puzzle-example { margin:0; color:var(--muted); font-size:.91rem; font-weight:800; }
 .puzzle-example img { display:block; width:100%; border-radius:9px; margin-top:5px; background:#f5edf9; }
 .puzzle-grid { display:grid; grid-template-columns:repeat(var(--puzzle-side,2),minmax(0,1fr)); gap:4px; padding:6px; border-radius:13px; background:#e5ddf3; }
-.puzzle-tile { min-width:0; aspect-ratio:4 / 3; padding:0; border:0; border-radius:4px; background-repeat:no-repeat; outline-offset:-4px; }
+.puzzle-tile { min-width:0; aspect-ratio:var(--puzzle-piece-ratio,4 / 3); padding:0; border:0; border-radius:4px; background-repeat:no-repeat; outline-offset:-4px; }
 .puzzle-tile[aria-pressed="true"] { outline:4px solid #572acc; box-shadow:inset 0 0 0 6px #fff9; }
 .puzzle-grid.complete { gap:0; background:#d8f5e5; animation:trace-pop .6s both; }
 .puzzle-grid.complete .puzzle-tile { border-radius:0; opacity:1; }
@@ -407,8 +408,9 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
   <div class="panel puzzle-panel" id="picture-puzzle">
     <h2>그림 맞추기</h2><p class="small puzzle-caption">조각 두 개를 차례로 눌러 자리를 바꿔요.</p>
     <div class="row puzzle-settings">
-      <button class="button" id="picture-easy" type="button" aria-pressed="true">4조각</button><button class="button" id="picture-hard" type="button" aria-pressed="false">9조각</button>
+      <button class="button" id="picture-easy" type="button" aria-pressed="true">4조각</button><button class="button" id="picture-middle" type="button" aria-pressed="false">6조각</button><button class="button" id="picture-hard" type="button" aria-pressed="false">9조각</button><button class="button" id="picture-expert" type="button" aria-pressed="false">16조각</button>
       <label class="field" for="puzzle-scene">그림 고르기</label><select id="puzzle-scene"></select>
+      <button class="button" id="picture-next" type="button">다른 그림</button>
       <button class="button" id="picture-restart" type="button">다시 섞기</button>
     </div>
     <div class="puzzle-content">
@@ -499,12 +501,22 @@ const EXTRA_WORDS = [
   ['해','','☀️'],['구름','cloud','☁️'],['눈송이','snowflake','❄️'],['무지개','rainbow','🌈'],['나무','tree','🌳'],['산','mountain','⛰️'],
   ['집','house','🏠'],['양말','sock','🧦'],['신발','shoe','👟'],['손','','✋'],['눈','','👀'],['코','','👃']
 ];
+const MORE_HANGUL_WORDS = [
+  ['개구리','🐸'],['다람쥐','🐿️'],['원숭이','🐵'],['여우','🦊'],['기린','🦒'],['부엉이','🦉'],
+  ['문어','🐙'],['게','🦀'],['상어','🦈'],['돌고래','🐬'],['조개','🐚'],['새우','🦐'],
+  ['밥','🍚'],['국','🍲'],['주먹밥','🍙'],['만두','🥟'],['떡','🍡'],['피자','🍕'],
+  ['소방차','🚒'],['구급차','🚑'],['경찰차','🚓'],['택시','🚕'],['지하철','🚇'],['헬리콥터','🚁'],
+  ['가위','✂️'],['열쇠','🔑'],['안경','👓'],['스펀지','🧽'],['침대','🛏️'],['휴지','🧻'],
+  ['바다','🌊'],['비','🌧️'],['번개','⚡'],['불','🔥'],['잎','🍃'],['버섯','🍄'],
+  ['공','⚽'],['풍선','🎈'],['연','🪁'],['인형','🧸'],['블록','🧱'],['선물','🎁'],
+  ['망고','🥭'],['레몬','🍋'],['파인애플','🍍'],['멜론','🍈'],['블루베리','🫐'],['아보카도','🥑']
+];
 const WORDS = [
   ['사과','🍎'],['나비','🦋'],['토끼','🐰'],['기차','🚂'],['자동차','🚗'],
   ['우산','☂️'],['바나나','🍌'],['고양이','🐱'],['강아지','🐶'],
   ['딸기','🍓'],['수박','🍉'],['별','⭐'],['우유','🥛'],['사자','🦁'],['코끼리','🐘'],
   ['오리','🦆'],['물고기','🐟'],['고래','🐳'],['거북이','🐢'],['공룡','🦕'],['꽃','🌷'],
-  ['달','🌙'],['모자','🧢'],['사탕','🍬'],...EXTRA_WORDS.map(([korean,,picture]) => [korean,picture])
+  ['달','🌙'],['모자','🧢'],['사탕','🍬'],...EXTRA_WORDS.map(([korean,,picture]) => [korean,picture]),...MORE_HANGUL_WORDS
 ];
 const LETTERS = [
   ['가','ㄱ','ㅏ'],['나','ㄴ','ㅏ'],['다','ㄷ','ㅏ'],['마','ㅁ','ㅏ'],
@@ -515,7 +527,11 @@ const LETTERS = [
   ['거','ㄱ','ㅓ'],['너','ㄴ','ㅓ'],['더','ㄷ','ㅓ'],['러','ㄹ','ㅓ'],['머','ㅁ','ㅓ'],['버','ㅂ','ㅓ'],['서','ㅅ','ㅓ'],
   ['어','ㅇ','ㅓ'],['저','ㅈ','ㅓ'],['처','ㅊ','ㅓ'],['커','ㅋ','ㅓ'],['터','ㅌ','ㅓ'],['퍼','ㅍ','ㅓ'],['허','ㅎ','ㅓ'],
   ['구','ㄱ','ㅜ'],['두','ㄷ','ㅜ'],['무','ㅁ','ㅜ'],['부','ㅂ','ㅜ'],['수','ㅅ','ㅜ'],['우','ㅇ','ㅜ'],['주','ㅈ','ㅜ'],
-  ['추','ㅊ','ㅜ'],['쿠','ㅋ','ㅜ'],['투','ㅌ','ㅜ'],['푸','ㅍ','ㅜ'],['후','ㅎ','ㅜ'],['리','ㄹ','ㅣ'],['시','ㅅ','ㅣ']
+  ['추','ㅊ','ㅜ'],['쿠','ㅋ','ㅜ'],['투','ㅌ','ㅜ'],['푸','ㅍ','ㅜ'],['후','ㅎ','ㅜ'],['리','ㄹ','ㅣ'],['시','ㅅ','ㅣ'],
+  ['기','ㄱ','ㅣ'],['니','ㄴ','ㅣ'],['디','ㄷ','ㅣ'],['비','ㅂ','ㅣ'],['이','ㅇ','ㅣ'],['지','ㅈ','ㅣ'],
+  ['치','ㅊ','ㅣ'],['키','ㅋ','ㅣ'],['티','ㅌ','ㅣ'],['피','ㅍ','ㅣ'],['히','ㅎ','ㅣ'],['라','ㄹ','ㅏ'],
+  ['타','ㅌ','ㅏ'],['카','ㅋ','ㅏ'],['차','ㅊ','ㅏ'],['파','ㅍ','ㅏ'],['야','ㅇ','ㅑ'],['여','ㅇ','ㅕ'],
+  ['요','ㅇ','ㅛ'],['유','ㅇ','ㅠ'],['얘','ㅇ','ㅒ'],['예','ㅇ','ㅖ'],['위','ㅇ','ㅟ'],['왜','ㅇ','ㅙ']
 ];
 const ENGLISH_WORDS = [
   ['apple','🍎','사과'],['banana','🍌','바나나'],['bear','🐻','곰'],['bird','🐦','새'],
@@ -615,6 +631,7 @@ const ENGLISH_COLORS = [
 ];
 const ENGLISH_NUMBERS = ['one','two','three','four','five','six','seven','eight','nine','ten'];
 const INITIALS = Array.from('ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ');
+const VOWELS = Array.from('ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ');
 const FINALS = ['','ㄱ','ㄲ','ㄳ','ㄴ','ㄵ','ㄶ','ㄷ','ㄹ','ㄺ','ㄻ','ㄼ','ㄽ','ㄾ','ㄿ','ㅀ','ㅁ','ㅂ','ㅄ','ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
 const ALPHABET = Array.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 function wordCard([word,picture],answer,caption = word) {
@@ -625,6 +642,18 @@ const FINAL_CARDS = WORDS.flatMap((entry) => {
   const final = FINALS[(last.codePointAt(0) - 0xac00) % 28];
   return final && 'ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ'.includes(final) ? [wordCard(entry,final,last)] : [];
 });
+const VOWEL_CARDS = WORDS.map((entry) => {
+  const first = entry[0][0];
+  return wordCard(entry,VOWELS[Math.floor((first.codePointAt(0) - 0xac00) % 588 / 28)],first);
+});
+const SPELLING_CARDS = WORDS.filter(([word]) => word.length > 1 && new Set(word).size > 1).map(([word,picture]) => ({
+  title:'그림의 낱말을 만들어요.',
+  firstPrompt:'첫 글자를 골라요.',
+  nextPrompt:'그다음 글자를 골라요.',
+  completePrompt:'낱말을 만들었어요! ' + word + ' ⭐',
+  voice:word,picture,spelling:true,
+  steps:Array.from(word,(letter) => [letter])
+}));
 const COUNT_CARDS = NUMBER_ICONS.flatMap(([icon,label]) => COUNT_WORDS.slice(1).map((word,index) => ({
   answer:String(index + 1),groups:[Array(index + 1).fill(icon)],description:Array(index + 1).fill(label).join(', '),voice:word + ' 개'
 })));
@@ -719,7 +748,10 @@ const GAME_MODES = {
     {title:'첫 글자',prompt:'낱말의 첫 글자를 찾아요.',cards:WORDS.map((entry) => wordCard(entry,entry[0][0]))},
     {title:'끝 글자',prompt:'낱말의 마지막 글자를 찾아요.',cards:WORDS.map((entry) => wordCard(entry,entry[0].at(-1)))},
     {title:'첫 자음',prompt:'낱말의 첫 글자는 어떤 자음으로 시작할까요?',cards:WORDS.map((entry) => wordCard(entry,INITIALS[Math.floor((entry[0].codePointAt(0) - 0xac00) / 588)]))},
-    {title:'받침 찾기',prompt:'보이는 글자의 받침을 골라요.',cards:FINAL_CARDS}
+    {title:'받침 찾기',prompt:'보이는 글자의 받침을 골라요.',cards:FINAL_CARDS},
+    {title:'모음 찾기',prompt:'보이는 글자의 모음을 골라요.',cards:VOWEL_CARDS},
+    {title:'몇 글자?',prompt:'이 낱말은 몇 글자일까요?',cards:WORDS.map((entry) => wordCard(entry,String(entry[0].length)))},
+    {title:'낱말 만들기',recorded:true,cards:SPELLING_CARDS}
   ],
   numbers:[
     {title:'수 세기',prompt:'그림이 모두 몇 개일까요?',cards:COUNT_CARDS},
@@ -817,7 +849,10 @@ function renderQuestionPicture(card) {
       const blank = card.pattern ? index === icons.length - 1 : index >= storyStep;
       tiles.append(element('span',icon,blank ? 'thinking-tile blank' : 'thinking-tile'));
     });
-    picture.setAttribute('aria-label',card.steps ? storyStep + ' / ' + card.steps.length + ' 장면을 골랐어요.' : card.description);
+    const progress = storyStep + ' / ' + (card.steps?.length || 0);
+    picture.setAttribute('aria-label',card.spelling ? card.voice + ' 그림, ' + progress + ' 글자를 골랐어요.'
+      : card.steps ? progress + ' 순서를 골랐어요.' : card.description);
+    if (card.spelling) picture.append(element('span',card.picture,'spelling-picture'));
     picture.append(tiles);
     return;
   }
@@ -897,6 +932,11 @@ function nextQuestion() {
   $('feedback').textContent = question.steps ? question.firstPrompt || '먼저 할 일을 골라요.' : '';
   $('game-stars').classList.remove('earned');
   const displayed = question.fixedChoices ? choices : shuffled(choices);
+  if (question.spelling && displayed.every(([letter],index) => letter === question.steps[index][0])) {
+    const different = displayed.findIndex(([letter]) => letter !== displayed[0][0]);
+    [displayed[0],displayed[different]] = [displayed[different],displayed[0]];
+  }
+  $('options').style.setProperty('--option-count',displayed.length);
   $('options').replaceChildren(...displayed.map(([label,icon,caption]) => {
     const choice = button(icon ? '' : label,() => chooseGameOption(label,choice),icon ? 'option picture-choice' : 'option');
     if (icon) {
@@ -1861,12 +1901,39 @@ pressedOnly($('sticker-options'),stampIndex);
 openStickerScene(0);
 refreshStamps();
 
+const PUZZLE_POSTERS = [
+  ['동네의 집','집',['#ffd292','#e48b83','#addef4','#addef4','#75bda7'],
+    '<rect width="400" height="300" fill="#cce9ff"/><circle cx="64" cy="58" r="31" fill="#ffcc65"/><path d="M0 186Q102 148 203 190T400 170V300H0Z" fill="#a6d791"/><path d="M194 253l-50 47h127l-42-47z" fill="#f5d8a5"/><path d="M24 213v-65m17 65v-65m17 65v-65m-43 20h52m-52 22h52" stroke="#fffcf4" stroke-width="8"/><path d="M353 218v-62" stroke="#53735d" stroke-width="9"/><rect x="337" y="151" width="37" height="26" rx="6" fill="#df8493"/>'],
+  ['도로 위 자동차','자동차',['#ee8e7a','#b9e8fa','#a5d8f2','#4d546d','#4d546d','#ffe39a'],
+    '<rect width="400" height="300" fill="#e0f3ff"/><path d="M0 147L80 80l49 42 75-57 86 66 68-46 42 33v182H0Z" fill="#b5d8a6"/><path d="M0 192h400v108H0z" fill="#6f7c94"/><path d="M0 266h400" stroke="#f8e29f" stroke-width="8" stroke-dasharray="26 16"/><circle cx="343" cy="52" r="26" fill="#ffd789"/><path d="M31 167v-67m0 3q26-12 42 0" fill="none" stroke="#626a78" stroke-width="7"/><circle cx="73" cy="104" r="11" fill="#fff7c6"/>'],
+  ['비 온 뒤 무지개','무지개',['#ec8277','#ffc979','#a4d48a','#92b9ec','#f7f9ff','#f7f9ff'],
+    '<rect width="400" height="300" fill="#d9f0ff"/><path d="M0 251q70-35 141-9t115-8 144-13v79H0z" fill="#a6d897"/><circle cx="59" cy="65" r="26" fill="#ffe39b"/><path d="M287 53q14-21 31-7 23-14 39 9h-70Z" fill="#fbf9ff"/><path d="M72 151l-6 14m253-21l-6 14m29 11l-6 14" stroke="#93c1ec" stroke-width="5" stroke-linecap="round"/><circle cx="258" cy="271" r="7" fill="#e68fae"/><circle cx="101" cy="268" r="8" fill="#f7cb6b"/>'],
+  ['생일 케이크','케이크',['#aeddde','#f7c79a','#f7a8c3','#9a9ce3','#ffca68','#ffd7e2'],
+    '<rect width="400" height="300" fill="#fde7f1"/><path d="M0 218h400v82H0z" fill="#d6b6e5"/><path d="M0 37q200 73 400 0" fill="none" stroke="#a474ba" stroke-width="4"/><path d="M44 50l28 8-18 22z M313 62l29-8-9 29z" fill="#b993ed"/><path d="M96 65l25 5-15 21z M264 71l27-5-10 27z" fill="#ffc370"/><circle cx="52" cy="143" r="24" fill="#f3a4be"/><circle cx="349" cy="119" r="21" fill="#9fcfee"/><path d="M53 164l3 61m292-85l-4 72" stroke="#ae80a0" stroke-width="3"/>'],
+  ['칙칙폭폭 기차','기차',['#74b9a7','#f2a577','#a7d8f5','#e8bb64','#5b6385','#5b6385','#5b6385'],
+    '<rect width="400" height="300" fill="#e2edf9"/><path d="M0 143l72-58 61 54 107-66 67 56 93-44v215H0Z" fill="#a5cfa1"/><path d="M0 234h400v66H0z" fill="#d6b49e"/><path d="M0 244h400m-400 18h400" stroke="#6b676b" stroke-width="5"/><path d="M18 250v16m37-16v16m37-16v16m37-16v16m37-16v16m37-16v16m37-16v16m37-16v16m37-16v16m37-16v16m37-16v16" stroke="#766253" stroke-width="6"/><circle cx="101" cy="75" r="15" fill="#fffaf4"/><circle cx="68" cy="51" r="23" fill="#fffaf4"/>'],
+  ['하늘을 나는 비행기','비행기',['#f0aa7c','#eaf2fe','#b9c8f1','#8dccf0','#8dccf0','#75abd9'],
+    '<rect width="400" height="300" fill="#a9d6f7"/><circle cx="318" cy="59" r="30" fill="#ffe098"/><path d="M45 67q18-36 48-14q28-19 48 15H45Z M248 245q19-30 47-13 25-19 48 13z M24 205q20-24 44-9 24-10 47 9z" fill="#fffaf4"/><path d="M44 250q123 35 204-22t120-3" stroke="#f5f9ff" stroke-width="6" stroke-dasharray="13 12" fill="none"/>'],
+  ['노란 우산','우산',['#8377bd','#f4b976','#f7d66d','#b6ace4','#83beed'],
+    '<rect width="400" height="300" fill="#cadcf5"/><path d="M0 213h400v87H0z" fill="#a8afd5"/><path d="M0 235q100-26 191 6t209-5v64H0z" fill="#bfc9ea"/><path d="M42 66l-10 24m98-39l-11 26m56 147l-11 25m186-187l-10 24m-18 51l-10 24" stroke="#85abdf" stroke-width="7" stroke-linecap="round"/><ellipse cx="74" cy="258" rx="44" ry="13" fill="#dce9ff"/><ellipse cx="344" cy="265" rx="36" ry="10" fill="#dce9ff"/>'],
+  ['꼬마 로봇','로봇',['#fcce76','#a1d3eb','#b1a5e3','#7abca8','#7abca8','#4c567a','#f0a9ba'],
+    '<rect width="400" height="300" fill="#deddf6"/><path d="M0 230h400v70H0z" fill="#a8a9cc"/><path d="M28 83h78v86H28z M297 60h76v88h-76z" fill="#c4c8eb"/><path d="M43 111h47m-47 17h47m222-34h47m-47 17h47" stroke="#8d8cc0" stroke-width="5"/><circle cx="68" cy="205" r="13" fill="#ffcd72"/><circle cx="331" cy="188" r="11" fill="#f3a8bf"/><path d="M0 264h400" stroke="#e5e2f5" stroke-width="7" stroke-dasharray="18 13"/>'],
+  ['열기구 나들이','열기구',['#a48168','#a48168','#f3a4bb','#f5c579','#a7a3e2','#c49566'],
+    '<rect width="400" height="300" fill="#d9efff"/><path d="M0 215l92-97 109 89 77-76 122 87v82H0Z" fill="#a3cba5"/><path d="M0 247q74-39 141 0t108 9 151-16v60H0z" fill="#9ccdec"/><path d="M16 70q11-23 29-13 16-15 37 13H16Z M308 88q11-23 29-13 16-15 37 13h-66Z" fill="#fffafe"/><circle cx="338" cy="43" r="23" fill="#ffdf8c"/>']
+];
+const PUZZLE_PICTURES = [...PLAY_SCENES,...PUZZLE_POSTERS.map(([name,subject,colors,background]) => ({
+  name,
+  background:background + COLORING_PAGES.find((page) => page.name === subject).parts.map(([,path],index) =>
+    '<path d="' + path + '" fill="' + colors[index] + '" stroke="#514c76" stroke-width="3" stroke-linejoin="round"/>').join(''),
+  picture:[]
+}))];
+const PICTURE_SIZES = {'picture-easy':[2,2],'picture-middle':[3,2],'picture-hard':[3,3],'picture-expert':[4,4]};
 function puzzlePicture(scene) {
   const pictures = scene.picture.map(([icon,x,y,size]) => '<text x="' + x + '" y="' + y + '" font-size="' + size +
     '" text-anchor="middle" dominant-baseline="central">' + icon + '</text>').join('');
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">' + scene.background + pictures + '</svg>');
 }
-let pictureSide = 2;
+let pictureSize = PICTURE_SIZES['picture-easy'];
 let picturePieces = [];
 let pictureSelection;
 let pictureSolved = false;
@@ -1888,48 +1955,53 @@ function selectPicturePiece(position) {
   refreshPicture();
 }
 function refreshPicture() {
+  const [columns,rows] = pictureSize;
   const grid = $('puzzle-grid');
   grid.classList.toggle('complete',pictureSolved);
   Array.from(grid.children).forEach((tile,index) => {
     const piece = picturePieces[index];
-    const x = (piece % pictureSide) * 100 / (pictureSide - 1);
-    const y = Math.floor(piece / pictureSide) * 100 / (pictureSide - 1);
+    const x = (piece % columns) * 100 / (columns - 1);
+    const y = Math.floor(piece / columns) * 100 / (rows - 1);
     tile.style.backgroundPosition = x + '% ' + y + '%';
     tile.setAttribute('aria-label',(piece + 1) + '번 그림 조각');
     tile.setAttribute('aria-pressed',index === pictureSelection);
     tile.setAttribute('aria-disabled',pictureSolved);
   });
 }
-function startPicture(side) {
-  pictureSide = side;
-  picturePieces = shuffled(Array.from({length:side * side},(_,index) => index));
+function startPicture(size) {
+  pictureSize = size;
+  const [columns,rows] = size;
+  picturePieces = shuffled(Array.from({length:columns * rows},(_,index) => index));
   if (picturePieces.every((piece,index) => piece === index)) [picturePieces[0],picturePieces[1]] = [1,0];
   pictureSelection = undefined;
   pictureSolved = false;
-  const scene = PLAY_SCENES[Number($('puzzle-scene').value)];
+  const scene = PUZZLE_PICTURES[Number($('puzzle-scene').value)];
   const image = puzzlePicture(scene);
   const preview = $('puzzle-example');
   preview.src = image;
   preview.alt = scene.name + ' 완성 그림';
   const grid = $('puzzle-grid');
-  grid.style.setProperty('--puzzle-side',side);
+  grid.style.setProperty('--puzzle-side',columns);
+  grid.style.setProperty('--puzzle-piece-ratio',(4 * rows) + ' / ' + (3 * columns));
   grid.replaceChildren(...picturePieces.map((_,position) => {
     const tile = button('',() => selectPicturePiece(position),'puzzle-tile');
     tile.style.backgroundImage = 'url("' + image + '")';
-    tile.style.backgroundSize = (side * 100) + '% ' + (side * 100) + '%';
+    tile.style.backgroundSize = (columns * 100) + '% ' + (rows * 100) + '%';
     return tile;
   }));
-  $('picture-easy').setAttribute('aria-pressed',side === 2);
-  $('picture-hard').setAttribute('aria-pressed',side === 3);
+  for (const [id,option] of Object.entries(PICTURE_SIZES)) $(id).setAttribute('aria-pressed',option === size);
   $('picture-status').textContent = '';
   refreshPicture();
 }
-PLAY_SCENES.forEach(({name},index) => $('puzzle-scene').add(new Option(name,index)));
-$('picture-easy').addEventListener('click',() => startPicture(2));
-$('picture-hard').addEventListener('click',() => startPicture(3));
-$('picture-restart').addEventListener('click',() => startPicture(pictureSide));
-$('puzzle-scene').addEventListener('change',() => startPicture(pictureSide));
-startPicture(2);
+PUZZLE_PICTURES.forEach(({name},index) => $('puzzle-scene').add(new Option(name,index)));
+for (const [id,size] of Object.entries(PICTURE_SIZES)) $(id).addEventListener('click',() => startPicture(size));
+$('picture-restart').addEventListener('click',() => startPicture(pictureSize));
+$('puzzle-scene').addEventListener('change',() => startPicture(pictureSize));
+$('picture-next').addEventListener('click',() => {
+  $('puzzle-scene').value = String((Number($('puzzle-scene').value) + 1) % PUZZLE_PICTURES.length);
+  startPicture(pictureSize);
+});
+startPicture(pictureSize);
 
 function memoryPictures(entries) {
   return entries.map(([name,icon]) => ({name,icon}));
