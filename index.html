@@ -90,6 +90,39 @@ textarea { width:100%; min-height:125px; margin:8px 0; }
 .swatch { width:42px; height:42px; border-radius:50%; background:var(--swatch); border:2px solid #ffffff; box-shadow:0 0 0 1px #c7bed0; }
 .swatch[aria-pressed="true"] { background:var(--swatch); box-shadow:0 0 0 3px #34265c; }
 canvas { display:block; width:100%; height:auto; background:#fff; border:2px dashed #dbcfc3; border-radius:13px; touch-action:none; }
+.trace-game { --neon:#b9a1ff; margin-top:15px; padding:20px clamp(12px,3vw,30px); border-radius:22px; background:#171331; color:#f8f4ff; }
+.trace-head { display:flex; gap:8px; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.trace-head h2 { margin:0; }
+.trace-count { margin:0; color:#ddd1ff; font-size:.9rem; font-weight:800; white-space:nowrap; }
+.animal-picker { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:7px; }
+.animal { min-width:0; min-height:56px; display:flex; align-items:center; justify-content:center; gap:7px; padding:5px 2px; background:#231c44; border:1px solid #483c6b; color:#f4ecff; border-radius:11px; font-size:.9rem; font-weight:800; }
+.animal > span:first-child { font-size:1.43rem; line-height:1.2; }
+.animal[aria-pressed="true"] { background:#3b2a64; border-color:#bda4ff; box-shadow:0 0 0 1px #bda4ff; }
+.animal .animal-check { width:13px; color:#9df5df; font-size:.82rem; }
+.trace-board { width:min(100%,660px); margin:14px auto 0; border:1px solid #3c315d; border-radius:17px; background:radial-gradient(ellipse at 48% 42%,#31224d,#120e28 78%); }
+.trace-board svg { display:block; width:100%; height:auto; touch-action:none; cursor:crosshair; }
+.trace-board.done svg { cursor:default; }
+.trace-picture path { fill:none; stroke-linecap:round; stroke-linejoin:round; pointer-events:none; }
+.trace-picture .trace-fill { fill:var(--fill,transparent); opacity:0; transition:opacity .45s; }
+.trace-board.done .trace-fill { opacity:.55; }
+.trace-guide { stroke:#9183a8; stroke-width:3; stroke-dasharray:2 7; opacity:.55; }
+.trace-guide.active { stroke:var(--neon); stroke-width:4; opacity:.92; }
+.trace-ink { stroke:var(--neon); stroke-width:6; filter:drop-shadow(0 0 4px var(--neon)); }
+.trace-ink-core { stroke:#fff5ff; stroke-width:1.8; opacity:.9; }
+.trace-beacon { fill:#fffeff; stroke:var(--neon); stroke-width:3; pointer-events:none; filter:drop-shadow(0 0 6px var(--neon)); }
+.trace-sparks { fill:#ffe69a; opacity:0; pointer-events:none; }
+.trace-board.done .trace-sparks { opacity:1; animation:trace-spark .9s ease-out both; }
+.trace-board.done .trace-picture { transform-box:fill-box; transform-origin:center; animation:trace-pop .68s cubic-bezier(.22,1,.36,1) both; }
+@keyframes trace-pop { 0% { transform:scale(.95); } 45% { transform:scale(1.07); } 100% { transform:scale(1); } }
+@keyframes trace-spark { 0% { opacity:0; transform:translateY(12px); } 40% { opacity:1; } }
+.trace-meter { display:flex; justify-content:center; gap:6px; margin:12px 0 5px; }
+.trace-meter span { width:22px; height:6px; border-radius:9px; background:#44395c; }
+.trace-meter span.active { background:#9984c7; }
+.trace-meter span.done { background:#b0ffe7; }
+.trace-status { margin:0; min-height:29px; text-align:center; color:#f2e8ff; }
+.trace-actions { justify-content:center; margin-top:8px; }
+.trace-actions .button { color:#eee4ff; background:#251e42; border-color:#544474; }
+.trace-actions .primary { color:#24153f; background:#d8c2ff; border-color:#d8c2ff; }
 footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
 @media (max-width:760px) {
   .bar,main,footer { width:calc(100% - 28px); }
@@ -108,8 +141,10 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
   .panel { padding:14px; }
   .form { grid-template-columns:1fr 1fr; }.form .field:first-child { grid-column:1/-1; }
   .range strong { order:2; width:100%; }
+  .animal { flex-direction:column; gap:2px; min-height:62px; font-size:.79rem; position:relative; }
+  .animal .animal-check { position:absolute; top:4px; right:2px; }
 }
-@media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none !important; } }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none !important; animation:none !important; } }
 </style>
 </head>
 <body>
@@ -127,7 +162,7 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
   </div>
   <div class="cards">
     <a class="jump" href="#hangul"><span class="jump-icon" aria-hidden="true">ㄱ</span><h3>한글놀이</h3><p class="small">그림을 보고 낱말 카드를 찾아요.</p></a>
-    <a class="jump" href="#art"><span class="jump-icon" aria-hidden="true">✿</span><h3>미술놀이</h3><p class="small">색을 고르고 나만의 그림을 그려요.</p></a>
+    <a class="jump" href="#art"><span class="jump-icon" aria-hidden="true">✿</span><h3>미술놀이</h3><p class="small">네온 점선을 따라 동물을 그려요.</p></a>
     <a class="jump" href="#family"><span class="jump-icon" aria-hidden="true">▦</span><h3>가족 대시보드</h3><p class="small">우리 일정과 주말 나들이를 모아봐요.</p></a>
   </div>
 </section>
@@ -156,10 +191,36 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
 </section>
 <section id="art" hidden>
   <div class="section-head">
-    <div><h1 class="page-title" tabindex="-1">미술놀이</h1><p id="art-prompt">알록달록한 사과를 그려볼까?</p></div>
-    <button class="button" id="idea" type="button">다른 그리기 주제</button>
+    <h1 class="page-title" tabindex="-1">미술놀이</h1>
+    <div class="row" aria-label="미술놀이 종류">
+      <button class="button" id="trace-mode" type="button" aria-pressed="true">동물 따라 그리기</button>
+      <button class="button" id="free-mode" type="button" aria-pressed="false">자유 그리기</button>
+    </div>
   </div>
-  <div class="panel">
+  <div class="trace-game" id="trace-game">
+    <div class="trace-head"><h2>네온 동물 친구들</h2><p id="trace-count" class="trace-count"></p></div>
+    <div id="animal-picker" class="animal-picker" aria-label="동물 고르기"></div>
+    <div id="trace-board" class="trace-board">
+      <svg id="trace-svg" viewBox="0 0 440 320" role="img" aria-describedby="trace-status">
+        <defs><pattern id="trace-grid" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#9a82bb" opacity=".2"/></pattern></defs>
+        <rect width="440" height="320" fill="url(#trace-grid)"/>
+        <g id="trace-picture" class="trace-picture"></g>
+        <g class="trace-sparks" aria-hidden="true">
+          <path d="M65 66l5 13 13 5-13 5-5 13-5-13-13-5 13-5z M368 46l4 10 10 4-10 4-4 10-4-10-10-4 10-4z M357 225l6 16 16 6-16 6-6 16-6-16-16-6 16-6z M72 251l4 9 9 4-9 4-4 9-4-9-9-4 9-4z"/>
+          <circle cx="99" cy="54" r="3"/><circle cx="345" cy="87" r="3"/><circle cx="390" cy="219" r="4"/><circle cx="100" cy="281" r="3"/>
+        </g>
+        <circle class="trace-beacon" id="trace-beacon" r="6"/>
+      </svg>
+    </div>
+    <div id="trace-meter" class="trace-meter" aria-hidden="true"></div>
+    <p id="trace-status" class="trace-status" role="status"></p>
+    <div class="row trace-actions">
+      <button class="button" id="trace-reset" type="button" disabled>다시 그리기</button>
+      <button class="button primary" id="trace-next" type="button" hidden>다음 동물</button>
+    </div>
+  </div>
+  <div class="panel" id="free-art" hidden>
+    <div class="section-head"><p id="art-prompt">알록달록한 사과를 그려볼까?</p><button class="button" id="idea" type="button">다른 그리기 주제</button></div>
     <div class="row art-tools">
       <div class="row" id="colors" aria-label="그리기 색상"></div>
       <div class="row"><button class="button" id="undo" type="button" disabled>되돌리기</button><button class="button" id="clear" type="button" disabled>지우기</button><button class="button primary" id="save-art" type="button" disabled>그림 저장</button></div>
@@ -454,6 +515,230 @@ $('delete-recording').addEventListener('click', async () => {
     voiceStatus.textContent = '선택한 낱말의 녹음을 지웠어요.';
   } catch { voiceStatus.textContent = '녹음을 지우지 못했어요.'; }
 });
+
+const ANIMALS = [
+  {
+    name:'토끼', icon:'🐰', glow:'#ff9cde', fill:'#6c376e',
+    parts:[
+      ['왼쪽 귀','M168 153 C137 133 120 78 134 47 C152 23 183 72 194 146 Q181 146 168 153 Z',true],
+      ['오른쪽 귀','M246 146 C257 72 288 23 306 47 C320 78 303 133 272 153 Q259 146 246 146 Z',true],
+      ['얼굴','M220 141 C155 141 109 182 109 223 C109 270 157 285 220 285 C283 285 331 270 331 223 C331 182 285 141 220 141 Z',true],
+      ['입','M195 236 Q208 254 220 236 Q232 254 245 236']
+    ],
+    details:'M173 211 a6 8 0 1 0 12 0 a6 8 0 1 0 -12 0 M255 211 a6 8 0 1 0 12 0 a6 8 0 1 0 -12 0 M211 225 Q220 219 229 225 Q225 235 220 237 Q215 235 211 225 Z'
+  },
+  {
+    name:'고양이', icon:'🐱', glow:'#7fe7ff', fill:'#285d79',
+    parts:[
+      ['얼굴과 귀','M220 132 Q190 132 162 145 Q130 95 105 81 Q94 112 104 198 Q88 229 116 255 Q154 286 220 286 Q286 286 324 255 Q352 229 336 198 Q346 112 335 81 Q310 95 278 145 Q250 132 220 132 Z',true],
+      ['왼쪽 수염','M67 207 Q98 215 133 225'],
+      ['오른쪽 수염','M373 207 Q342 215 307 225'],
+      ['입','M193 238 Q208 256 220 238 Q232 256 247 238']
+    ],
+    details:'M168 206 a5 8 0 1 0 10 0 a5 8 0 1 0 -10 0 M262 206 a5 8 0 1 0 10 0 a5 8 0 1 0 -10 0 M211 224 Q220 221 229 224 Q225 235 220 238 Q215 235 211 224 Z'
+  },
+  {
+    name:'곰', icon:'🐻', glow:'#ffd28f', fill:'#795438',
+    parts:[
+      ['왼쪽 귀','M123 125 C87 118 85 76 112 62 C138 49 160 65 160 91'],
+      ['오른쪽 귀','M280 91 C280 65 302 49 328 62 C355 76 353 118 317 125'],
+      ['얼굴','M220 81 C158 81 104 132 98 191 C93 252 151 281 220 281 C289 281 347 252 342 191 C336 132 282 81 220 81 Z',true],
+      ['코 둘레','M220 184 C185 184 169 199 169 220 C169 244 192 257 220 257 C248 257 271 244 271 220 C271 199 255 184 220 184 Z']
+    ],
+    details:'M161 171 a5 8 0 1 0 10 0 a5 8 0 1 0 -10 0 M269 171 a5 8 0 1 0 10 0 a5 8 0 1 0 -10 0 M207 209 Q220 202 233 209 Q228 221 220 225 Q212 221 207 209 Z'
+  },
+  {
+    name:'여우', icon:'🦊', glow:'#ff9e83', fill:'#793b55',
+    parts:[
+      ['얼굴과 귀','M220 129 Q191 129 165 141 L104 72 Q92 106 104 181 Q106 238 220 282 Q334 238 336 181 Q348 106 336 72 L275 141 Q249 129 220 129 Z',true],
+      ['왼쪽 볼','M106 181 Q173 182 220 263'],
+      ['오른쪽 볼','M334 181 Q267 182 220 263']
+    ],
+    details:'M164 183 Q171 168 184 178 Q174 177 168 187 Z M276 183 Q269 168 256 178 Q266 177 272 187 Z M211 259 Q220 254 229 259 Q225 269 220 273 Q215 269 211 259 Z'
+  },
+  {
+    name:'펭귄', icon:'🐧', glow:'#9df5df', fill:'#315a74',
+    parts:[
+      ['몸','M220 40 C158 40 135 89 133 143 Q87 191 99 207 Q114 219 133 194 C132 242 162 279 220 281 C278 279 308 242 307 194 Q326 219 341 207 Q353 191 307 143 C305 89 282 40 220 40 Z',true],
+      ['배','M220 94 Q191 64 165 97 C142 128 144 191 164 231 Q184 265 220 266 Q256 265 276 231 C296 191 298 128 275 97 Q249 64 220 94 Z'],
+      ['왼쪽 발','M171 267 Q137 272 151 288 Q164 301 201 285'],
+      ['오른쪽 발','M269 267 Q303 272 289 288 Q276 301 239 285']
+    ],
+    details:'M183 125 a5 8 0 1 0 10 0 a5 8 0 1 0 -10 0 M247 125 a5 8 0 1 0 10 0 a5 8 0 1 0 -10 0 M204 145 Q220 131 236 145 L220 158 Z'
+  }
+];
+const TRACE_SPACING = 4;
+const TRACE_RADIUS = 22;
+const traceSvg = $('trace-svg');
+const traceBoard = $('trace-board');
+const tracePicture = $('trace-picture');
+const traceBeacon = $('trace-beacon');
+const traceStates = ANIMALS.map(() => ({part:0, sample:0}));
+const finishedAnimals = new Set();
+let animalIndex = 0;
+let traceParts;
+let tracePointer;
+
+function svgPath(d, className) {
+  const path = document.createElementNS(traceSvg.namespaceURI,'path');
+  path.setAttribute('d',d);
+  path.setAttribute('class',className);
+  return path;
+}
+
+function mountAnimal(index) {
+  animalIndex = index;
+  tracePointer = undefined;
+  const animal = ANIMALS[index];
+  traceSvg.setAttribute('aria-label',animal.name + ' 따라 그리기');
+  $('trace-game').style.setProperty('--neon',animal.glow);
+  tracePicture.replaceChildren();
+  for (const [,d,filled] of animal.parts) {
+    if (!filled) continue;
+    const fill = svgPath(d,'trace-fill');
+    fill.style.setProperty('--fill',animal.fill);
+    tracePicture.append(fill);
+  }
+  const details = svgPath(animal.details,'trace-fill');
+  details.style.setProperty('--fill','#fff4e7');
+  tracePicture.append(details);
+  traceParts = animal.parts.map(([label,d]) => {
+    const guide = svgPath(d,'trace-guide');
+    const neon = svgPath(d,'trace-ink');
+    const shine = svgPath(d,'trace-ink-core');
+    tracePicture.append(guide,neon,shine);
+    const length = guide.getTotalLength();
+    const samples = Array.from({length:Math.ceil(length / TRACE_SPACING) + 1},(_,sample) => (
+      guide.getPointAtLength(Math.min(length,sample * TRACE_SPACING))
+    ));
+    for (const line of [neon,shine]) line.setAttribute('stroke-dasharray',length + ' ' + length);
+    return {label,guide,lines:[neon,shine],length,samples};
+  });
+  $('trace-meter').replaceChildren(...traceParts.map(() => element('span')));
+  renderTrace();
+}
+
+function renderTrace() {
+  const state = traceStates[animalIndex];
+  const complete = state.part === traceParts.length;
+  traceParts.forEach(({guide,lines,length},index) => {
+    const done = index < state.part;
+    const active = index === state.part;
+    const drawn = done ? length : active ? Math.min(length,state.sample * TRACE_SPACING) : 0;
+    guide.classList.toggle('active',active);
+    guide.style.display = done ? 'none' : '';
+    for (const line of lines) {
+      line.style.display = drawn ? '' : 'none';
+      line.setAttribute('stroke-dashoffset',length - drawn);
+    }
+    $('trace-meter').children[index].className = done ? 'done' : active ? 'active' : '';
+  });
+  traceBeacon.style.display = complete ? 'none' : '';
+  if (!complete) {
+    const point = traceParts[state.part].samples[state.sample];
+    traceBeacon.setAttribute('cx',point.x);
+    traceBeacon.setAttribute('cy',point.y);
+  }
+  traceBoard.classList.toggle('done',complete);
+  const text = complete
+    ? finishedAnimals.size === ANIMALS.length ? '모든 동물을 그렸어요!' : ANIMALS[animalIndex].name + ' 완성! ✨'
+    : traceParts[state.part].label + ' · 빛나는 점에서 시작해요.';
+  if ($('trace-status').textContent !== text) $('trace-status').textContent = text;
+  $('trace-count').textContent = '완성 ' + finishedAnimals.size + ' / ' + ANIMALS.length;
+  $('trace-reset').disabled = state.part === 0 && state.sample === 0;
+  $('trace-next').hidden = !complete;
+  Array.from($('animal-picker').children).forEach((option,index) => {
+    option.setAttribute('aria-pressed',index === animalIndex);
+    const finished = finishedAnimals.has(index);
+    option.setAttribute('aria-label',ANIMALS[index].name + (finished ? ' 완성' : ''));
+    option.querySelector('.animal-check').textContent = finished ? '✓' : '';
+  });
+}
+
+function tracePoint(event) {
+  const matrix = traceSvg.getScreenCTM();
+  return matrix && new DOMPoint(event.clientX,event.clientY).matrixTransform(matrix.inverse());
+}
+
+function traceDistance(a,b) {
+  return Math.hypot(a.x - b.x,a.y - b.y);
+}
+
+function advanceTrace(samples,sample,from,to) {
+  const steps = Math.max(1,Math.ceil(traceDistance(from,to) / TRACE_SPACING));
+  for (let step = 1; step <= steps && sample < samples.length - 1; step++) {
+    const fraction = step / steps;
+    const point = {x:from.x + (to.x - from.x) * fraction,y:from.y + (to.y - from.y) * fraction};
+    while (sample < samples.length - 1 && traceDistance(point,samples[sample + 1]) <= TRACE_RADIUS) sample++;
+  }
+  return sample;
+}
+
+traceSvg.addEventListener('pointerdown',(event) => {
+  const state = traceStates[animalIndex];
+  if (event.button !== 0 || tracePointer || state.part === traceParts.length) return;
+  const point = tracePoint(event);
+  if (!point || traceDistance(point,traceParts[state.part].samples[state.sample]) > TRACE_RADIUS) return;
+  traceSvg.setPointerCapture(event.pointerId);
+  tracePointer = {id:event.pointerId,point};
+});
+traceSvg.addEventListener('pointermove',(event) => {
+  if (tracePointer?.id !== event.pointerId) return;
+  const point = tracePoint(event);
+  if (!point || traceDistance(point,tracePointer.point) < 1) return;
+  const state = traceStates[animalIndex];
+  const {samples} = traceParts[state.part];
+  const next = advanceTrace(samples,state.sample,tracePointer.point,point);
+  tracePointer.point = point;
+  if (next === state.sample) return;
+  state.sample = next;
+  if (next === samples.length - 1) {
+    state.part++;
+    state.sample = 0;
+    tracePointer = undefined;
+    if (state.part === traceParts.length) finishedAnimals.add(animalIndex);
+  }
+  renderTrace();
+});
+for (const name of ['pointerup','pointercancel','lostpointercapture']) {
+  traceSvg.addEventListener(name,(event) => {
+    if (tracePointer?.id === event.pointerId) tracePointer = undefined;
+  });
+}
+
+ANIMALS.forEach(({icon,name},index) => {
+  const option = button('',() => mountAnimal(index),'animal');
+  const emoji = element('span',icon);
+  emoji.setAttribute('aria-hidden','true');
+  const check = element('span','','animal-check');
+  check.setAttribute('aria-hidden','true');
+  option.append(emoji,element('span',name),check);
+  $('animal-picker').append(option);
+});
+$('trace-reset').addEventListener('click',() => {
+  traceStates[animalIndex] = {part:0,sample:0};
+  mountAnimal(animalIndex);
+});
+$('trace-next').addEventListener('click',() => {
+  const indices = ANIMALS.map((_,offset) => (animalIndex + offset + 1) % ANIMALS.length);
+  mountAnimal(indices.find((index) => !finishedAnimals.has(index)) ?? indices[0]);
+  $('animal-picker').children[animalIndex].focus();
+});
+function showArtMode(tracing) {
+  $('trace-game').hidden = !tracing;
+  $('free-art').hidden = tracing;
+  $('trace-mode').setAttribute('aria-pressed',tracing);
+  $('free-mode').setAttribute('aria-pressed',!tracing);
+  tracePointer = undefined;
+  if (tracing && !traceParts) mountAnimal(animalIndex);
+}
+$('trace-mode').addEventListener('click',() => showArtMode(true));
+$('free-mode').addEventListener('click',() => showArtMode(false));
+function startTraceOnArtPage() {
+  if (!$('art').hidden && !traceParts) mountAnimal(animalIndex);
+}
+window.addEventListener('hashchange',startTraceOnArtPage);
+startTraceOnArtPage();
 
 const COLORS = [['보라','#7e5ed8'],['빨강','#e45158'],['노랑','#f0ac32'],['초록','#2a9c76'],['파랑','#3c7de6'],['검정','#263049']];
 const IDEAS = ['알록달록한 사과를 그려볼까?','날개가 큰 나비를 그려볼까?','우리만의 기차를 그려볼까?','꿈에 나온 동물을 그려볼까?'];
