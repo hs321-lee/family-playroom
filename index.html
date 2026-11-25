@@ -43,13 +43,14 @@ p { line-height:1.65; }
 .spark { position:absolute; color:#7658ba; font-size:2rem; }
 .spark.first { top:33px; right:14%; }
 .spark.second { bottom:52px; right:74%; font-size:1.3rem; }
-.cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:15px; margin-top:20px; }
+.cards { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:15px; margin-top:20px; }
 .jump { min-height:148px; display:block; background:white; border:1px solid var(--line); border-radius:18px; padding:19px; color:inherit; text-decoration:none; transition:transform .16s,box-shadow .16s; }
 .jump:hover { transform:translateY(-3px); box-shadow:0 8px 18px #29234612; }
 .jump-icon { display:grid; place-items:center; width:44px; height:41px; border-radius:11px; margin-bottom:11px; font-weight:900; font-size:1.15rem; }
 .jump:nth-child(1) .jump-icon { color:#553e9b; background:#efe6ff; }
 .jump:nth-child(2) .jump-icon { color:#a04431; background:#ffe4d7; }
 .jump:nth-child(3) .jump-icon { color:#1f6652; background:#d9f2e7; }
+.jump:nth-child(4) .jump-icon { color:#93661b; background:#fff1c0; }
 .jump p { margin-bottom:0; }
 .panel { background:white; border:1px solid var(--line); border-radius:21px; padding:25px; margin-top:16px; }
 .section-head { display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:13px; }
@@ -123,6 +124,34 @@ canvas { display:block; width:100%; height:auto; background:#fff; border:2px das
 .trace-actions { justify-content:center; margin-top:8px; }
 .trace-actions .button { color:#eee4ff; background:#251e42; border-color:#544474; }
 .trace-actions .primary { color:#24153f; background:#d8c2ff; border-color:#d8c2ff; }
+.trace-reward { display:flex; align-items:center; justify-content:center; gap:10px; margin:9px 0 0; font-weight:800; }
+.trace-reward:not([hidden]) { animation:trace-pop .7s both; }
+.sticker-art { width:64px; height:64px; flex:0 0 auto; display:grid; place-items:center; border-radius:16px; background:#fff3cc; border:1px solid #eacb7e; font-size:2rem; overflow:hidden; }
+.sticker-art img { display:block; width:100%; height:100%; object-fit:contain; padding:3px; }
+.routine-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:20px 22px; background:#fff1cb; border:1px solid #ebd8a1; border-radius:18px; }
+.routine-head h1 { margin-bottom:3px; }
+.routine-head p { margin:0; }
+.routine-total { background:#fffbeb; border-radius:11px; color:#634714; font-weight:800; padding:10px 12px; white-space:nowrap; }
+.routine-groups { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px; margin-top:13px; }
+.routine-card { --routine-tint:#fff2d1; --routine-line:#e0c165; --routine-ink:#5f4309; background:#fffdf7; border:1px solid #ebdfc4; border-radius:17px; padding:17px; }
+.routine-card.evening { --routine-tint:#e4f2f4; --routine-line:#83b6bc; --routine-ink:#205563; border-color:#cbdfe2; background:#f9fcfd; }
+.routine-title { display:flex; align-items:center; justify-content:space-between; gap:7px; margin:0 0 11px; }
+.routine-title h2 { margin:0; }
+.routine-title span { color:var(--routine-ink); font-weight:850; white-space:nowrap; }
+.routine-list { display:grid; gap:8px; }
+.routine-check { display:flex; align-items:center; gap:10px; min-height:52px; width:100%; text-align:left; padding:8px 10px; border:1px solid #ddd6cc; border-radius:10px; background:white; font-weight:800; }
+.routine-check[aria-pressed="true"] { background:var(--routine-tint); color:var(--routine-ink); border-color:var(--routine-line); }
+.routine-check > span:first-child { display:grid; place-items:center; width:28px; height:28px; flex:0 0 28px; border-radius:9px; border:2px solid #c3b9ad; color:var(--routine-ink); }
+.routine-check[aria-pressed="true"] > span:first-child { background:white; border-color:var(--routine-line); }
+.routine-prize { display:flex; align-items:center; gap:10px; padding-top:12px; margin-top:13px; border-top:1px solid #e9e0d2; }
+.routine-prize .locked { filter:grayscale(1); opacity:.5; }
+.routine-prize .sticker-new { animation:trace-pop .7s both; }
+.routine-prize p { margin:0; }
+.routine-settings { margin-top:13px; padding:13px 16px; }
+.routine-settings p { margin:8px 0; }
+.sticker-fields { align-items:flex-end; }
+.sticker-fields input[type="file"] { max-width:min(100%,260px); }
+.sticker-fields input[type="text"] { max-width:170px; }
 footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
 @media (max-width:760px) {
   .bar,main,footer { width:calc(100% - 28px); }
@@ -143,6 +172,9 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
   .range strong { order:2; width:100%; }
   .animal { flex-direction:column; gap:2px; min-height:62px; font-size:.79rem; position:relative; }
   .animal .animal-check { position:absolute; top:4px; right:2px; }
+  .routine-head { padding:14px; }
+  .routine-total { padding:8px; font-size:.84rem; }
+  .routine-groups { grid-template-columns:1fr; }
 }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none !important; animation:none !important; } }
 </style>
@@ -151,7 +183,7 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
 <header><div class="bar">
   <a class="brand" href="#home"><span class="logo" aria-hidden="true">✿</span> 우리집 놀이터</a>
   <nav aria-label="주 메뉴">
-    <a href="#hangul">한글놀이</a><a href="#art">미술놀이</a><a href="#family">가족 대시보드</a>
+    <a href="#hangul">한글놀이</a><a href="#art">미술놀이</a><a href="#family">가족 대시보드</a><a href="#routine">오늘 할 일</a>
   </nav>
 </div></header>
 <main>
@@ -164,6 +196,7 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
     <a class="jump" href="#hangul"><span class="jump-icon" aria-hidden="true">ㄱ</span><h3>한글놀이</h3><p class="small">그림을 보고 낱말 카드를 찾아요.</p></a>
     <a class="jump" href="#art"><span class="jump-icon" aria-hidden="true">✿</span><h3>미술놀이</h3><p class="small">네온 점선을 따라 동물을 그려요.</p></a>
     <a class="jump" href="#family"><span class="jump-icon" aria-hidden="true">▦</span><h3>가족 대시보드</h3><p class="small">우리 일정과 주말 나들이를 모아봐요.</p></a>
+    <a class="jump" href="#routine"><span class="jump-icon" aria-hidden="true">★</span><h3>오늘 할 일</h3><p class="small">아침·저녁 할 일을 하고 스티커를 받아요.</p></a>
   </div>
 </section>
 <section id="hangul" hidden>
@@ -214,6 +247,7 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
     </div>
     <div id="trace-meter" class="trace-meter" aria-hidden="true"></div>
     <p id="trace-status" class="trace-status" role="status"></p>
+    <div class="trace-reward" id="trace-reward" hidden></div>
     <div class="row trace-actions">
       <button class="button" id="trace-reset" type="button" disabled>다시 그리기</button>
       <button class="button primary" id="trace-next" type="button" hidden>다음 동물</button>
@@ -231,7 +265,7 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
 <section id="family" hidden>
   <div class="section-head">
     <div><h1 class="page-title" tabindex="-1">가족 대시보드</h1><p class="small">확정한 일정과 나들이 후보를 확인해요.</p></div>
-    <div class="row" aria-label="조회 단위"><button class="button" id="week" type="button" aria-pressed="true">주간</button><button class="button" id="month" type="button" aria-pressed="false">월간</button></div>
+    <div class="row"><a href="#routine" class="button">오늘 할 일</a><button class="button" id="week" type="button" aria-pressed="true">주간</button><button class="button" id="month" type="button" aria-pressed="false">월간</button></div>
   </div>
   <div class="row range"><button class="button" id="previous" type="button">이전</button><strong id="date-range" aria-live="polite"></strong><button class="button" id="forward" type="button">다음</button></div>
   <div class="row"><button class="button" id="today" type="button">오늘로</button><button class="button" id="schedule-tab" type="button" aria-pressed="true">가족 일정</button><button class="button" id="outings-tab" type="button" aria-pressed="false">나들이 브리핑</button></div>
@@ -264,8 +298,27 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
     </details>
   </div>
 </section>
+<section id="routine" hidden>
+  <div class="routine-head">
+    <div><h1 class="page-title" tabindex="-1">오늘 할 일</h1><p class="small" id="routine-date"></p></div>
+    <div class="routine-total" id="routine-total"></div>
+  </div>
+  <div class="routine-groups" id="routine-groups"></div>
+  <p id="routine-status" class="small feedback" role="status"></p>
+  <details class="panel routine-settings">
+    <summary>부모 메뉴 · 보상 사진</summary>
+    <p class="small">사진을 고르면 할 일과 네온 그림을 완성할 때 스티커로 보여요. 사진은 이 브라우저에 저장돼요.</p>
+    <form class="row sticker-fields" id="sticker-form">
+      <label class="field">스티커 이름 <input id="sticker-name" type="text" maxlength="28" value="피카츄"></label>
+      <label class="field">사진 <input id="sticker-file" type="file" accept="image/*"></label>
+      <button class="button primary" type="submit" id="sticker-save">사진 저장</button>
+      <button class="button" type="button" id="sticker-clear">기본 별로 바꾸기</button>
+    </form>
+    <p id="sticker-status" class="small feedback" role="status"></p>
+  </details>
+</section>
 </main>
-<footer>가족 일정과 녹음은 이 브라우저에서만 볼 수 있어요.</footer>
+<footer>가족 기록, 사진과 녹음은 이 브라우저에서만 볼 수 있어요.</footer>
 <script>
 'use strict';
 const $ = (id) => document.getElementById(id);
@@ -296,7 +349,7 @@ function button(label, onClick, className = 'button') {
 }
 function showPage(focus) {
   const requested = location.hash.slice(1);
-  const sections = ['home','hangul','art','family'];
+  const sections = ['home','hangul','art','family','routine'];
   const section = sections.includes(requested) ? requested : 'home';
   sections.forEach((key) => { $(key).hidden = section !== key; });
   document.querySelectorAll('nav a').forEach((link) => {
@@ -516,6 +569,34 @@ $('delete-recording').addEventListener('click', async () => {
   } catch { voiceStatus.textContent = '녹음을 지우지 못했어요.'; }
 });
 
+const stickerKey = 'family-playroom-reward-photo';
+function readSticker() {
+  try {
+    const sticker = JSON.parse(localStorage.getItem(stickerKey));
+    if (typeof sticker?.name === 'string' && /^data:image\/(webp|png);base64,/.test(sticker.photo)) return sticker;
+  } catch { /* A reward is available while browser storage is unavailable. */ }
+  return {name:'별'};
+}
+function stickerArt(sticker,className = '') {
+  const art = element('span','','sticker-art ' + className);
+  art.setAttribute('aria-hidden','true');
+  if (sticker.photo) {
+    const picture = document.createElement('img');
+    picture.src = sticker.photo;
+    picture.alt = '';
+    art.append(picture);
+  } else {
+    art.textContent = '⭐';
+  }
+  return art;
+}
+function renderTraceReward(complete) {
+  const reward = $('trace-reward');
+  const sticker = complete ? readSticker() : null;
+  reward.hidden = !sticker?.photo;
+  if (sticker?.photo) reward.replaceChildren(stickerArt(sticker),element('span',sticker.name + ' 스티커!'));
+}
+
 const ANIMALS = [
   {
     name:'토끼', icon:'🐰', glow:'#ff9cde', fill:'#6c376e',
@@ -644,6 +725,7 @@ function renderTrace() {
     ? finishedAnimals.size === ANIMALS.length ? '모든 동물을 그렸어요!' : ANIMALS[animalIndex].name + ' 완성! ✨'
     : traceParts[state.part].label + ' · 빛나는 점에서 시작해요.';
   if ($('trace-status').textContent !== text) $('trace-status').textContent = text;
+  renderTraceReward(complete);
   $('trace-count').textContent = '완성 ' + finishedAnimals.size + ' / ' + ANIMALS.length;
   $('trace-reset').disabled = state.part === 0 && state.sample === 0;
   $('trace-next').hidden = !complete;
@@ -1021,6 +1103,152 @@ $('add-event').addEventListener('click',() => startEvent({date:iso(anchor)}));
 $('cancel-event').addEventListener('click',() => { form.hidden = true; editId = undefined; $('add-event').focus(); });
 $('seeds').append(...STARTER_PLACES.map((item) => renderPlace(item)));
 renderFamily();
+
+const routineKey = 'family-playroom-routine';
+const ROUTINES = [
+  {id:'morning',title:'아침 할 일',icon:'☀️',items:['세수하기','양치하기','옷 갈아입기','아침밥 먹기']},
+  {id:'evening',title:'저녁 할 일',icon:'🌙',items:['장난감 정리하기','양치하기','책 읽기','가방 챙기기']}
+];
+
+function routineRecords() {
+  try {
+    const data = JSON.parse(localStorage.getItem(routineKey));
+    if (data && typeof data === 'object' && !Array.isArray(data)) return data;
+  } catch { /* A fresh checklist can still be shown. */ }
+  return {};
+}
+function checkedRoutine(data,day) {
+  return Array.isArray(data[day]?.checked) ? data[day].checked : [];
+}
+function routineRewards(data,day) {
+  return Array.isArray(data[day]?.rewards) ? data[day].rewards : [];
+}
+function routineItemId(group,index) {
+  return group.id + '-' + index;
+}
+
+function toggleRoutine(group,index) {
+  const date = currentDate();
+  const all = routineRecords();
+  const checked = new Set(checkedRoutine(all,date));
+  const rewards = new Set(routineRewards(all,date));
+  const id = routineItemId(group,index);
+  if (checked.has(id)) checked.delete(id);
+  else checked.add(id);
+  const awarded = !rewards.has(group.id) && group.items.every((_,itemIndex) => checked.has(routineItemId(group,itemIndex)));
+  if (awarded) rewards.add(group.id);
+  all[date] = {checked:[...checked],rewards:[...rewards]};
+  const status = $('routine-status');
+  if (!persist(routineKey,all,status)) return;
+  renderRoutine(awarded ? group.id : '');
+  status.textContent = awarded ? group.title + ' 완료! ' + readSticker().name + ' 스티커를 받았어요.' : '';
+  $(id).focus({preventScroll:true});
+}
+
+function renderRoutine(newReward = '') {
+  const date = currentDate();
+  const data = routineRecords();
+  const checked = checkedRoutine(data,date);
+  const rewards = routineRewards(data,date);
+  const sticker = readSticker();
+  const total = Object.keys(data).reduce((count,day) => count + routineRewards(data,day).length,0);
+  $('routine-date').textContent = dateLabel(fromIso(date));
+  $('routine-date').dataset.date = date;
+  $('routine-total').textContent = '스티커 ' + total + '개';
+  $('routine-groups').replaceChildren(...ROUTINES.map((group) => {
+    const card = element('section','','routine-card ' + group.id);
+    const title = element('div','','routine-title');
+    const count = group.items.filter((_,index) => checked.includes(routineItemId(group,index))).length;
+    title.append(element('h2',group.icon + ' ' + group.title),element('span',count + ' / ' + group.items.length));
+    const list = element('div','','routine-list');
+    group.items.forEach((item,index) => {
+      const id = routineItemId(group,index);
+      const done = checked.includes(id);
+      const check = button('',() => toggleRoutine(group,index),'routine-check');
+      check.id = id;
+      check.setAttribute('aria-pressed',done);
+      const mark = element('span',done ? '✓' : '');
+      mark.setAttribute('aria-hidden','true');
+      check.append(mark,element('span',item));
+      list.append(check);
+    });
+    const won = rewards.includes(group.id);
+    const prize = element('div','','routine-prize');
+    const copy = element('div');
+    copy.append(element('h3',won ? sticker.name + ' 스티커 받았어요!' : '다 하면 ' + sticker.name + ' 스티커!'));
+    copy.append(element('p',count === group.items.length ? '할 일을 다 했어요.' : (group.items.length - count) + '개 남았어요.','small'));
+    prize.append(stickerArt(sticker,won ? (newReward === group.id ? 'sticker-new' : '') : 'locked'),copy);
+    card.append(title,list,prize);
+    return card;
+  }));
+}
+
+async function stickerPhoto(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    const image = new Image();
+    await new Promise((resolve,reject) => {
+      image.onload = resolve;
+      image.onerror = reject;
+      image.src = url;
+    });
+    const scale = Math.min(1,320 / Math.max(image.naturalWidth,image.naturalHeight));
+    const output = document.createElement('canvas');
+    output.width = Math.max(1,Math.round(image.naturalWidth * scale));
+    output.height = Math.max(1,Math.round(image.naturalHeight * scale));
+    output.getContext('2d').drawImage(image,0,0,output.width,output.height);
+    return output.toDataURL('image/webp',.86);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+$('sticker-form').addEventListener('submit',async (event) => {
+  event.preventDefault();
+  const fileInput = $('sticker-file');
+  const nameInput = $('sticker-name');
+  const status = $('sticker-status');
+  const file = fileInput.files[0];
+  const previous = readSticker();
+  const name = nameInput.value.trim() || '우리';
+  if (!file && !previous.photo) { status.textContent = '스티커에 사용할 사진을 골라 주세요.'; return; }
+  const controls = Array.from(event.currentTarget.elements);
+  controls.forEach((control) => { control.disabled = true; });
+  let photo;
+  try { photo = file ? await stickerPhoto(file) : previous.photo; }
+  catch { status.textContent = '이 사진을 열 수 없어요. JPG나 PNG 사진을 골라 주세요.'; }
+  finally { controls.forEach((control) => { control.disabled = false; }); }
+  if (photo && persist(stickerKey,{name,photo},status)) {
+    fileInput.value = '';
+    nameInput.value = name;
+    status.textContent = name + ' 스티커 사진을 저장했어요.';
+    renderRoutine();
+    if (traceParts) renderTraceReward(traceBoard.classList.contains('done'));
+  }
+});
+$('sticker-clear').addEventListener('click',() => {
+  const status = $('sticker-status');
+  try {
+    localStorage.removeItem(stickerKey);
+    $('sticker-file').value = '';
+    $('sticker-name').value = '피카츄';
+    status.textContent = '기본 별 스티커로 바꿨어요.';
+    renderRoutine();
+    if (traceParts) renderTraceReward(traceBoard.classList.contains('done'));
+  } catch { status.textContent = '저장한 사진을 지우지 못했어요.'; }
+});
+const savedSticker = readSticker();
+if (savedSticker.photo) $('sticker-name').value = savedSticker.name;
+function refreshRoutineDate() {
+  if (!$('routine').hidden && $('routine-date').dataset.date !== currentDate()) {
+    $('routine-status').textContent = '';
+    renderRoutine();
+  }
+}
+window.addEventListener('hashchange',refreshRoutineDate);
+document.addEventListener('visibilitychange',refreshRoutineDate);
+setInterval(refreshRoutineDate,30000);
+refreshRoutineDate();
 </script>
 </body>
 </html>
