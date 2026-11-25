@@ -451,7 +451,9 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
   </div>
   <div class="panel" id="outings-panel" hidden>
     <h2>나들이 브리핑</h2>
+    <p class="small">매주 목요일에 주말 나들이 정보가 올라와요.</p>
     <div id="briefs"></div>
+    <p id="published-outings-status" class="small" role="status" hidden></p>
     <details>
       <summary>브리핑 가져오기</summary>
       <p class="small">ChatGPT에서 받은 브리핑을 JSON 형식으로 붙여넣으세요. 발행일이 같은 브리핑은 새 내용으로 갱신돼요.</p>
@@ -562,7 +564,9 @@ function button(label, onClick, className = 'button') {
 function showPage(focus) {
   const requested = location.hash.slice(1);
   const sections = ['home','art','puzzle','family','routine',...Object.keys(LEARNING_PAGES)];
-  const section = requested === 'memory' ? 'puzzle' : Object.hasOwn(ART_ROUTES,requested) ? 'art' : sections.includes(requested) ? requested : 'home';
+  const linkedSections = {memory:'puzzle',outings:'family'};
+  const section = Object.hasOwn(linkedSections,requested) ? linkedSections[requested]
+    : Object.hasOwn(ART_ROUTES,requested) ? 'art' : sections.includes(requested) ? requested : 'home';
   sections.forEach((key) => { $(key).hidden = section !== key; });
   document.querySelectorAll('nav a').forEach((link) => {
     const learningMenu = link.closest('#main-menu') && link.hash === '#hangul' && Boolean(LEARNING_PAGES[section]);
@@ -2140,9 +2144,11 @@ function validDate(value) {
 }
 let anchor = fromIso(currentDate());
 let view = 'week';
-let tab = 'schedule';
+let tab = location.hash === '#outings' ? 'outings' : 'schedule';
 const eventsKey = 'family-playroom-events';
 const briefsKey = 'family-playroom-briefs';
+const publishedMonths = new Map();
+const OUTINGS_CACHE_MS = 5 * 60 * 1000;
 function records(key) {
   try {
     const value = JSON.parse(localStorage.getItem(key) || '[]');
@@ -2165,6 +2171,63 @@ function range() {
 function dateLabel(date) {
   return new Intl.DateTimeFormat('ko-KR',{timeZone:'UTC',month:'long',day:'numeric',weekday:'short'}).format(date);
 }
+function monthsInRange(start,end) {
+  return Array.from(new Set([iso(start).slice(0,7),iso(shift(end,-1)).slice(0,7)]));
+}
+function publishedBriefs(data,month) {
+  if (data?.version !== 1 || !Array.isArray(data.briefings)) throw new Error('지원하지 않는 브리핑 파일');
+  return data.briefings.map(briefInput).filter((briefing) => briefing.date.startsWith(month + '-'));
+}
+async function loadOutingMonth(month,entry) {
+  try {
+    const response = await fetch('./outings/' + month + '.json',{cache:'no-cache'});
+    if (response.status === 404) entry.briefings = [];
+    else {
+      if (!response.ok) throw new Error('브리핑을 불러오지 못했어요.');
+      entry.briefings = publishedBriefs(await response.json(),month);
+    }
+    entry.error = false;
+  } catch {
+    entry.error = true;
+  } finally {
+    entry.loading = false;
+    entry.checked = Date.now();
+    refreshVisibleOutings();
+  }
+}
+function refreshVisibleOutings() {
+  if (tab === 'outings' && !$('family').hidden) {
+    const [start,end] = range();
+    renderOutings(start,end);
+  }
+}
+function renderOutings(start,end) {
+  const monthEntries = monthsInRange(start,end).map((month) => {
+    let entry = publishedMonths.get(month);
+    if (!entry) {
+      entry = {briefings:[],checked:0,loading:false,error:false};
+      publishedMonths.set(month,entry);
+    }
+    if (!entry.loading && Date.now() - entry.checked >= OUTINGS_CACHE_MS) {
+      entry.loading = true;
+      loadOutingMonth(month,entry);
+    }
+    return entry;
+  });
+  const briefings = new Map();
+  for (const briefing of [...monthEntries.flatMap((entry) => entry.briefings),...records(briefsKey)]) {
+    if (validDate(briefing?.date) && Array.isArray(briefing.items) && briefing.date >= iso(start) && briefing.date < iso(end)) {
+      briefings.set(briefing.date,briefing);
+    }
+  }
+  const ordered = Array.from(briefings.values()).sort((a,b) => b.date.localeCompare(a.date));
+  $('briefs').replaceChildren(...ordered.map(renderBrief));
+  const status = $('published-outings-status');
+  if (monthEntries.some((entry) => entry.loading)) status.textContent = '자동 브리핑을 불러오는 중이에요.';
+  else if (monthEntries.some((entry) => entry.error)) status.textContent = '자동 브리핑을 일부 불러오지 못했어요. 잠시 후 다시 열어 주세요.';
+  else status.textContent = ordered.length ? '' : '이 기간에는 발행된 브리핑이 없어요.';
+  status.hidden = !status.textContent;
+}
 function renderFamily() {
   const [start,end] = range();
   $('date-range').textContent = view === 'month'
@@ -2180,9 +2243,7 @@ function renderFamily() {
   const events = records(eventsKey).filter((event) => inside(event.date)).sort((a,b) => (a.date + a.time).localeCompare(b.date + b.time));
   $('events').replaceChildren(...events.map(renderEvent));
   if (!events.length) $('events').append(element('p','이 기간에 등록한 일정이 없어요.','empty'));
-  const briefs = records(briefsKey).filter((brief) => inside(brief.date)).sort((a,b) => b.date.localeCompare(a.date));
-  $('briefs').replaceChildren(...briefs.map(renderBrief));
-  if (!briefs.length) $('briefs').append(element('p','이 기간에 저장한 브리핑이 없어요. 받은 브리핑은 아래에서 가져올 수 있어요.','empty'));
+  refreshVisibleOutings();
 }
 function navigateRange(direction) {
   const [start] = range();
@@ -2258,10 +2319,25 @@ function renderBrief(brief) {
   const issue = element('article','','issue');
   issue.append(element('h3',dateLabel(fromIso(brief.date)) + ' 발행'));
   if (brief.weather) issue.append(element('p',brief.weather,'small'));
+  if (brief.weatherUrl) {
+    const link = element('a','날씨 예보 출처','button');
+    link.href = brief.weatherUrl;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    issue.append(link);
+  }
   const list = element('div','','outing-list');
   list.append(...brief.items.map((item) => renderPlace(item,brief.date)));
   issue.append(list);
   return issue;
+}
+function outingSourceUrl(value) {
+  if (!value) return '';
+  try {
+    const parsed = new URL(value);
+    if (['http:','https:'].includes(parsed.protocol) && !parsed.username && !parsed.password) return parsed.href;
+  } catch { /* Report URL validation below. */ }
+  throw new Error('공식 안내 링크를 http 또는 https 주소로 넣어 주세요.');
 }
 function briefInput(data) {
   if (!data || !validDate(data.date) || !Array.isArray(data.items) || !data.items.length || data.items.length > 20) {
@@ -2270,18 +2346,11 @@ function briefInput(data) {
   const limited = (value,max = 220) => typeof value === 'string' ? value.trim().slice(0,max) : '';
   const items = data.items.map((item) => {
     if (!item || !limited(item.title)) throw new Error('추천마다 장소 이름 title이 필요해요.');
-    let url = '';
-    if (item.url) {
-      try {
-        const parsed = new URL(item.url);
-        if (!['http:','https:'].includes(parsed.protocol) || parsed.username || parsed.password) throw new Error();
-        url = parsed.href;
-      } catch { throw new Error('공식 안내 링크를 http 또는 https 주소로 넣어 주세요.'); }
-    }
+    const url = outingSourceUrl(item.url);
     if (item.visitDate && !validDate(item.visitDate)) throw new Error('방문일 visitDate를 YYYY-MM-DD 형식으로 넣어 주세요.');
     return {title:limited(item.title,80),area:limited(item.area,80),type:limited(item.type,40),pick:limited(item.pick,60),address:limited(item.address),travel:limited(item.travel),visitDate:item.visitDate || '',time:limited(item.time,60),cost:limited(item.cost),booking:limited(item.booking),note:limited(item.note,400),url};
   });
-  return {date:data.date,weather:limited(data.weather),items};
+  return {date:data.date,weather:limited(data.weather),weatherUrl:outingSourceUrl(data.weatherUrl),items};
 }
 $('show-format').addEventListener('click',() => {
   const message = '방금 받은 나들이 브리핑을 아래 키의 JSON 객체로 바꿔 줘. date는 브리핑 발행일이다. visitDate는 추천 방문일이다. 날짜는 YYYY-MM-DD 형식으로 써 줘. 원문에서 확인할 수 없는 값은 빈 문자열로 두고, 추천마다 공식 안내 링크를 유지해 줘. JSON 객체만 출력해 줘.\n';
@@ -2318,6 +2387,13 @@ $('outings-tab').addEventListener('click',() => { tab = 'outings'; renderFamily(
 $('add-event').addEventListener('click',() => startEvent({date:iso(anchor)}));
 $('cancel-event').addEventListener('click',() => { form.hidden = true; editId = undefined; $('add-event').focus(); });
 $('seeds').append(...STARTER_PLACES.map((item) => renderPlace(item)));
+window.addEventListener('hashchange',() => {
+  if (location.hash === '#family' || location.hash === '#outings') {
+    tab = location.hash === '#outings' ? 'outings' : 'schedule';
+    renderFamily();
+  }
+});
+window.addEventListener('focus',refreshVisibleOutings);
 renderFamily();
 
 const routineKey = 'family-playroom-routine';
