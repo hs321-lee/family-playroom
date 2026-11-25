@@ -34,6 +34,7 @@ p { line-height:1.65; }
 .hero { position:relative; min-height:282px; background:#e9dfff; overflow:hidden; display:flex; align-items:center; border-radius:27px; padding:38px 43px; }
 .hero p { margin:0; color:#4a4367; font-weight:600; font-size:1.08rem; }
 .hero-copy { position:relative; z-index:2; }
+.hero-stars { display:inline-flex; margin-top:12px; padding:5px 10px; border-radius:9px; background:#fff7d6; color:#684709; font-weight:850; }
 .scene { position:absolute; inset:0 0 0 auto; width:48%; overflow:hidden; pointer-events:none; }
 .scene::before { content:""; position:absolute; width:285px; height:285px; right:9%; bottom:-145px; border:45px solid #ded1fb; border-radius:50%; }
 .tile { display:grid; place-items:center; position:absolute; width:114px; height:125px; font-weight:950; font-size:4.1rem; border-radius:22px; border:3px solid #fff9; box-shadow:0 9px 0 #34285418,0 14px 25px #3428541f; }
@@ -51,6 +52,9 @@ p { line-height:1.65; }
 .jump:nth-child(2) .jump-icon { color:#a04431; background:#ffe4d7; }
 .jump:nth-child(3) .jump-icon { color:#1f6652; background:#d9f2e7; }
 .jump:nth-child(4) .jump-icon { color:#93661b; background:#fff1c0; }
+.jump:nth-child(5) .jump-icon { color:#a04431; background:#ffe4d7; }
+.jump:nth-child(6) .jump-icon { color:#1f6652; background:#d9f2e7; }
+.jump:nth-child(7) .jump-icon { color:#553e9b; background:#efe6ff; }
 .jump p { margin-bottom:0; }
 .panel { background:white; border:1px solid var(--line); border-radius:21px; padding:25px; margin-top:16px; }
 .section-head { display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:13px; }
@@ -63,6 +67,22 @@ p { line-height:1.65; }
 .button:hover { box-shadow:0 2px 8px #30204720; }
 .game { max-width:800px; margin-left:auto; margin-right:auto; text-align:center; }
 .game .row { justify-content:center; }
+.learn-nav { margin-bottom:11px; }
+.learn-nav a { border:1px solid var(--line); background:white; }
+.learn-nav a[aria-current] { border-color:#ad98cf; background:#eee6ff; }
+.game-toolbar { display:flex; align-items:center; justify-content:space-between; gap:9px; flex-wrap:wrap; }
+.game-stars { color:#775210; background:#fff2c7; border-radius:9px; padding:6px 9px; font-size:.92rem; font-weight:850; }
+.game-stars.earned { animation:trace-pop .58s both; }
+.game .picture-caption { display:block; font-size:1.38rem; font-weight:800; color:#604981; }
+.quiz-picture.counting { min-height:119px; width:min(100%,355px); padding:10px; display:flex; align-items:center; justify-content:center; gap:8px; font-size:clamp(1.35rem,4.2vw,2.05rem); }
+.number-group { display:flex; max-width:190px; justify-content:center; flex-wrap:wrap; align-content:center; gap:5px; }
+.number-group span { display:inline-grid; place-items:center; min-width:1.26em; min-height:1.24em; }
+.ebs-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.ebs-list article { padding:18px; background:white; border:1px solid var(--line); border-radius:16px; }
+.ebs-list article p { min-height:48px; }
+.player-settings { margin-top:13px; padding:13px 16px; }
+.player-settings form { margin-top:10px; align-items:flex-end; }
+.player-settings .field input { width:min(240px,100%); }
 .quiz-prompt { font-size:1.35rem; margin:22px 0 5px; }
 .quiz-picture { display:grid; place-items:center; margin:0 auto 13px; min-height:119px; width:min(100%,250px); border-radius:19px; background:#fcf7eb; font-size:4rem; }
 .options { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:570px; margin:18px auto 4px; }
@@ -95,7 +115,10 @@ canvas { display:block; width:100%; height:auto; background:#fff; border:2px das
 .trace-head { display:flex; gap:8px; align-items:center; justify-content:space-between; margin-bottom:12px; }
 .trace-head h2 { margin:0; }
 .trace-count { margin:0; color:#ddd1ff; font-size:.9rem; font-weight:800; white-space:nowrap; }
-.animal-picker { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:7px; }
+.animal-picker { display:grid; grid-template-columns:repeat(auto-fit,minmax(80px,1fr)); gap:7px; }
+.animal-groups { margin-bottom:9px; }
+.animal-groups .button { color:#eee4ff; background:#251e42; border-color:#544474; min-height:38px; }
+.animal-groups .button[aria-pressed="true"] { background:#d8c2ff; border-color:#d8c2ff; color:#24153f; }
 .animal { min-width:0; min-height:56px; display:flex; align-items:center; justify-content:center; gap:7px; padding:5px 2px; background:#231c44; border:1px solid #483c6b; color:#f4ecff; border-radius:11px; font-size:.9rem; font-weight:800; }
 .animal > span:first-child { font-size:1.43rem; line-height:1.2; }
 .animal[aria-pressed="true"] { background:#3b2a64; border-color:#bda4ff; box-shadow:0 0 0 1px #bda4ff; }
@@ -175,6 +198,10 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
   .routine-head { padding:14px; }
   .routine-total { padding:8px; font-size:.84rem; }
   .routine-groups { grid-template-columns:1fr; }
+  .ebs-list { grid-template-columns:1fr; }
+  .ebs-list article p { min-height:0; }
+  .animal-picker { grid-template-columns:repeat(var(--animal-count,4),minmax(0,1fr)); }
+  .game-toolbar { justify-content:center; }
 }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none !important; animation:none !important; } }
 </style>
@@ -182,33 +209,47 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
 <body>
 <header><div class="bar">
   <a class="brand" href="#home"><span class="logo" aria-hidden="true">✿</span> 우리집 놀이터</a>
-  <nav aria-label="주 메뉴">
-    <a href="#hangul">한글놀이</a><a href="#art">미술놀이</a><a href="#family">가족 대시보드</a><a href="#routine">오늘 할 일</a>
+  <nav aria-label="주 메뉴" id="main-menu">
+    <a href="#hangul">배움놀이</a><a href="#art">미술놀이</a><a href="#family">가족 대시보드</a><a href="#routine">오늘 할 일</a>
   </nav>
 </div></header>
 <main>
 <section id="home">
   <div class="hero">
-    <div class="hero-copy"><h1 tabindex="-1">오늘은 뭐 하고<br>놀까?</h1><p>글자 카드, 그림 놀이, 주말 나들이</p></div>
-    <div class="scene" aria-hidden="true"><span class="tile one">가</span><span class="tile two">나</span><span class="tile three">✿</span><span class="spark first">✦</span><span class="spark second">✦</span></div>
+    <div class="hero-copy"><h1 tabindex="-1" id="home-title">오늘은 뭐 하고<br>놀까?</h1><p>글자 카드, 그림 놀이, 주말 나들이</p><span class="hero-stars" id="home-stars"></span></div>
+    <div class="scene" aria-hidden="true"><span class="tile one">가</span><span class="tile two">A</span><span class="tile three">3</span><span class="spark first">✦</span><span class="spark second">✦</span></div>
   </div>
   <div class="cards">
     <a class="jump" href="#hangul"><span class="jump-icon" aria-hidden="true">ㄱ</span><h3>한글놀이</h3><p class="small">그림을 보고 낱말 카드를 찾아요.</p></a>
+    <a class="jump" href="#numbers"><span class="jump-icon" aria-hidden="true">123</span><h3>숫자놀이</h3><p class="small">그림을 세고 빠진 숫자를 찾아요.</p></a>
+    <a class="jump" href="#english"><span class="jump-icon" aria-hidden="true">ABC</span><h3>영어놀이</h3><p class="small">알파벳과 그림 단어를 맞혀요.</p></a>
     <a class="jump" href="#art"><span class="jump-icon" aria-hidden="true">✿</span><h3>미술놀이</h3><p class="small">네온 점선을 따라 동물을 그려요.</p></a>
     <a class="jump" href="#family"><span class="jump-icon" aria-hidden="true">▦</span><h3>가족 대시보드</h3><p class="small">우리 일정과 주말 나들이를 모아봐요.</p></a>
     <a class="jump" href="#routine"><span class="jump-icon" aria-hidden="true">★</span><h3>오늘 할 일</h3><p class="small">아침·저녁 할 일을 하고 스티커를 받아요.</p></a>
+    <a class="jump" href="#ebs"><span class="jump-icon" aria-hidden="true">▶</span><h3>EBS 영상</h3><p class="small">한글·수학·영어 영상을 골라 봐요.</p></a>
   </div>
+  <details class="panel player-settings">
+    <summary>부모 메뉴 · 놀이터 별명</summary>
+    <form class="row" id="player-form">
+      <label class="field">별명 <input type="text" maxlength="12" id="player-name"></label>
+      <button class="button" type="submit">별명 저장</button>
+    </form>
+    <p id="player-status" class="small" role="status"></p>
+  </details>
 </section>
 <section id="hangul" hidden>
   <h1 class="page-title" tabindex="-1">한글놀이</h1>
-  <div class="panel game">
-    <div class="row" aria-label="한글놀이 종류"><button class="button" id="words-mode" type="button" aria-pressed="true">그림 카드</button><button class="button" id="letters-mode" type="button" aria-pressed="false">글자 만들기</button></div>
+  <nav class="learn-nav" aria-label="배움놀이"></nav>
+  <div data-game-slot>
+  <div class="panel game" id="learning-game">
+    <div class="game-toolbar"><div class="row" id="game-modes" aria-label="게임 고르기"></div><span class="game-stars" id="game-stars"></span></div>
     <p class="quiz-prompt" id="prompt"></p>
     <div class="quiz-picture" id="picture"></div>
     <button class="button" type="button" id="listen">소리 듣기</button>
     <div class="options" id="options"></div>
     <p class="feedback" id="feedback" role="status"></p>
     <button class="button primary" type="button" id="next">다음 카드</button>
+  </div>
   </div>
   <details class="panel">
     <summary>부모 메뉴 · 우리 목소리 카드</summary>
@@ -222,6 +263,25 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
     <p id="voice-status" class="small feedback" role="status">한 번에 최대 6초까지 녹음해요.</p>
   </details>
 </section>
+<section id="numbers" hidden>
+  <h1 class="page-title" tabindex="-1">숫자놀이</h1>
+  <nav class="learn-nav" aria-label="배움놀이"></nav>
+  <div data-game-slot></div>
+</section>
+<section id="english" hidden>
+  <h1 class="page-title" tabindex="-1">영어놀이</h1>
+  <nav class="learn-nav" aria-label="배움놀이"></nav>
+  <div data-game-slot></div>
+</section>
+<section id="ebs" hidden>
+  <h1 class="page-title" tabindex="-1">EBS 영상</h1>
+  <nav class="learn-nav" aria-label="배움놀이"></nav>
+  <div class="ebs-list">
+    <article><h2>한글이 야호2</h2><p class="small">‘아이’, ‘오이’, ‘우유’를 만나며 한글 모음을 익혀요.</p><div class="row"><a class="button primary" href="https://www.youtube.com/watch?v=OpukrvJ14mE" target="_blank" rel="noopener noreferrer">EBS 영상 보기</a><a class="button" href="#hangul">한글놀이</a></div></article>
+    <article><h2>수학이 야호</h2><p class="small">1부터 5까지 세고 숫자 0도 만나 봐요.</p><div class="row"><a class="button primary" href="https://www.youtube.com/watch?v=a4VWUpu9ArY" target="_blank" rel="noopener noreferrer">EBS 영상 보기</a><a class="button" href="#numbers">숫자놀이</a></div></article>
+    <article><h2>파닉스 팩토리</h2><p class="small">알파벳 B가 어떤 소리를 내는지 들어 봐요.</p><div class="row"><a class="button primary" href="https://www.youtube.com/watch?v=iiXr4d4T_Qk" target="_blank" rel="noopener noreferrer">EBS 영상 보기</a><a class="button" href="#english">영어놀이</a></div></article>
+  </div>
+</section>
 <section id="art" hidden>
   <div class="section-head">
     <h1 class="page-title" tabindex="-1">미술놀이</h1>
@@ -232,6 +292,7 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
   </div>
   <div class="trace-game" id="trace-game">
     <div class="trace-head"><h2>네온 동물 친구들</h2><p id="trace-count" class="trace-count"></p></div>
+    <div id="animal-groups" class="row animal-groups" aria-label="동물 종류"></div>
     <div id="animal-picker" class="animal-picker" aria-label="동물 고르기"></div>
     <div id="trace-board" class="trace-board">
       <svg id="trace-svg" viewBox="0 0 440 320" role="img" aria-describedby="trace-status">
@@ -325,12 +386,25 @@ const $ = (id) => document.getElementById(id);
 const WORDS = [
   ['사과','🍎'],['나비','🦋'],['토끼','🐰'],['기차','🚂'],['자동차','🚗'],
   ['우산','☂️'],['바나나','🍌'],['고양이','🐱'],['강아지','🐶'],
-  ['딸기','🍓'],['수박','🍉'],['별','⭐']
+  ['딸기','🍓'],['수박','🍉'],['별','⭐'],['우유','🥛'],['사자','🦁'],['코끼리','🐘'],
+  ['오리','🦆'],['물고기','🐟'],['고래','🐳'],['거북이','🐢'],['공룡','🦕'],['꽃','🌷'],
+  ['달','🌙'],['모자','🧢'],['사탕','🍬']
 ];
 const LETTERS = [
   ['가','ㄱ','ㅏ'],['나','ㄴ','ㅏ'],['다','ㄷ','ㅏ'],['마','ㅁ','ㅏ'],
-  ['고','ㄱ','ㅗ'],['누','ㄴ','ㅜ'],['도','ㄷ','ㅗ'],['미','ㅁ','ㅣ']
+  ['고','ㄱ','ㅗ'],['누','ㄴ','ㅜ'],['도','ㄷ','ㅗ'],['미','ㅁ','ㅣ'],
+  ['바','ㅂ','ㅏ'],['사','ㅅ','ㅏ'],['아','ㅇ','ㅏ'],['자','ㅈ','ㅏ'],
+  ['코','ㅋ','ㅗ'],['토','ㅌ','ㅗ'],['포','ㅍ','ㅗ'],['하','ㅎ','ㅏ'],
+  ['네','ㄴ','ㅔ'],['모','ㅁ','ㅗ'],['소','ㅅ','ㅗ'],['오','ㅇ','ㅗ']
 ];
+const ENGLISH_WORDS = [
+  ['apple','🍎','사과'],['banana','🍌','바나나'],['bear','🐻','곰'],['bird','🐦','새'],
+  ['book','📘','책'],['bus','🚌','버스'],['cat','🐱','고양이'],['dog','🐶','강아지'],
+  ['duck','🦆','오리'],['fish','🐟','물고기'],['flower','🌷','꽃'],['hat','🧢','모자'],
+  ['lion','🦁','사자'],['moon','🌙','달'],['rabbit','🐰','토끼'],['star','⭐','별'],
+  ['sun','☀️','해'],['turtle','🐢','거북이'],['umbrella','☂️','우산'],['water','💧','물']
+];
+const LEARNING_PAGES = {hangul:'한글놀이',numbers:'숫자놀이',english:'영어놀이',ebs:'EBS 영상'};
 const STARTER_PLACES = [
   {title:'국립과천과학관',area:'과천',type:'실내',cost:'상설전시 7세 미만 무료',note:'전시를 보며 좋아하는 공룡이나 우주 이야기를 골라보세요.',url:'https://smart.sciencecenter.go.kr/gcsci/info/info_fee.php'},
   {title:'서울대공원 동물원',area:'과천',type:'야외',note:'가기 전에 계절별 운영 시간과 입장료를 공식 안내에서 확인하세요.',url:'https://grandpark.seoul.go.kr/conts/contsView.do?lang=ko&menu_id=S001001001001'}
@@ -349,17 +423,17 @@ function button(label, onClick, className = 'button') {
 }
 function showPage(focus) {
   const requested = location.hash.slice(1);
-  const sections = ['home','hangul','art','family','routine'];
+  const sections = ['home','art','family','routine',...Object.keys(LEARNING_PAGES)];
   const section = sections.includes(requested) ? requested : 'home';
   sections.forEach((key) => { $(key).hidden = section !== key; });
   document.querySelectorAll('nav a').forEach((link) => {
-    if (link.hash === '#' + section) link.setAttribute('aria-current','page');
+    const learningMenu = link.closest('#main-menu') && link.hash === '#hangul' && Boolean(LEARNING_PAGES[section]);
+    if (link.hash === '#' + section || learningMenu) link.setAttribute('aria-current','page');
     else link.removeAttribute('aria-current');
   });
   if (focus) { $(section).querySelector('h1').focus(); window.scrollTo(0,0); }
 }
 window.addEventListener('hashchange', () => showPage(true));
-showPage(false);
 
 function shuffled(list) {
   const copy = [...list];
@@ -369,20 +443,17 @@ function shuffled(list) {
   }
   return copy;
 }
-let mode = 'words';
-let deck = [];
-let question;
-let solved;
 let pendingAudioAction = 0;
 let activeAudio;
-function speakLocal(text) {
+function speakLocal(text,lang = 'ko-KR') {
   if (!window.speechSynthesis) return false;
   const speech = window.speechSynthesis;
-  const voice = speech.getVoices().find((candidate) => /^ko(?:[-_]|$)/i.test(candidate.lang) && candidate.localService);
+  const language = lang.slice(0,2);
+  const voice = speech.getVoices().find((candidate) => candidate.localService && candidate.lang.slice(0,2).toLowerCase() === language);
   if (!voice) return false;
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.voice = voice;
-  utterance.lang = 'ko-KR';
+  utterance.lang = lang;
   utterance.rate = .85;
   speech.cancel();
   speech.speak(utterance);
@@ -393,7 +464,7 @@ function stopAudio() {
   if (activeAudio) { activeAudio.audio.pause(); activeAudio.release(); }
   window.speechSynthesis?.cancel();
 }
-async function listen(text, useRecording, status) {
+async function listen(text, useRecording, status, lang = 'ko-KR') {
   stopAudio();
   const action = pendingAudioAction;
   if (useRecording) {
@@ -405,53 +476,167 @@ async function listen(text, useRecording, status) {
     }
   }
   if (action !== pendingAudioAction) return;
-  if (!speakLocal(text)) status.textContent = '이 기기에서 한국어 음성을 찾지 못했어요. 부모 메뉴에서 목소리를 녹음할 수 있어요.';
+  if (!speakLocal(text,lang)) status.textContent = lang === 'ko-KR'
+    ? '이 기기에서 한국어 음성을 찾지 못했어요.'
+    : '이 기기에서 영어 음성을 찾지 못했어요.';
+}
+
+const NUMBER_ICONS = [['🍎','사과'],['⭐','별'],['🐥','병아리'],['🌷','꽃'],['🍓','딸기']];
+const COUNT_WORDS = ['','한','두','세','네','다섯','여섯','일곱','여덟','아홉','열'];
+const ADDITION = [[1,1],[1,2],[2,2],[3,1],[2,3],[1,4],[3,3],[2,4],[3,4],[2,5],[4,4],[3,5],[4,5],[5,5]];
+const ALPHABET = Array.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+const GAME_MODES = {
+  hangul:[
+    {title:'그림 카드',prompt:'그림에 맞는 낱말을 찾아요.',recorded:true,cards:WORDS.map(([word,picture]) => ({answer:word,picture,description:word + ' 그림'}))},
+    {title:'글자 만들기',prompt:'자음과 모음을 합쳐요.',cards:LETTERS.map(([answer,first,second]) => ({answer,picture:first + ' + ' + second}))},
+    {title:'첫 글자',prompt:'낱말의 첫 글자를 찾아요.',cards:WORDS.map(([word,picture]) => ({answer:word[0],picture,caption:word,voice:word,description:word}))}
+  ],
+  numbers:[
+    {title:'수 세기',prompt:'그림이 모두 몇 개일까요?',cards:COUNT_WORDS.slice(1).map((word,index) => {
+      const [icon,label] = NUMBER_ICONS[index % NUMBER_ICONS.length];
+      return {answer:String(index + 1),groups:[Array(index + 1).fill(icon)],description:Array(index + 1).fill(label).join(', '),voice:word + ' 개'};
+    })},
+    {title:'빠진 숫자',prompt:'빈칸에 들어갈 숫자를 골라요.',cards:Array.from({length:18},(_,index) => {
+      const number = index + 2;
+      return {answer:String(number),picture:(number - 1) + ' · □ · ' + (number + 1),numberLine:true};
+    })},
+    {title:'더하기',prompt:'두 묶음을 합치면 몇 개일까요?',cards:ADDITION.map(([left,right]) => ({
+      answer:String(left + right),groups:[Array(left).fill('🍎'),Array(right).fill('🍓')],
+      description:COUNT_WORDS[left] + ' 개의 사과와 ' + COUNT_WORDS[right] + ' 개의 딸기',voice:COUNT_WORDS[left + right] + ' 개'
+    }))}
+  ],
+  english:[
+    {title:'그림 단어',prompt:'그림에 맞는 영어 단어를 골라요.',cards:ENGLISH_WORDS.map(([answer,picture,korean]) => ({answer,picture,description:korean + ' 그림'}))},
+    {title:'알파벳 짝',prompt:'대문자에 맞는 소문자를 골라요.',cards:ALPHABET.map((upper) => ({answer:upper.toLowerCase(),picture:upper,voice:upper}))},
+    {title:'첫 알파벳',prompt:'빈칸에 들어갈 첫 알파벳을 찾아요.',cards:ENGLISH_WORDS.map(([word,picture,korean]) => ({
+      answer:word[0],picture,caption:'_' + word.slice(1),voice:word,description:korean + ', ' + '_' + word.slice(1)
+    }))}
+  ]
+};
+const playerKey = 'family-playroom-player';
+const player = {name:'',stars:{hangul:0,numbers:0,english:0}};
+try {
+  const saved = JSON.parse(localStorage.getItem(playerKey));
+  if (typeof saved?.name === 'string') player.name = saved.name.slice(0,12);
+  for (const subject of Object.keys(player.stars)) {
+    if (Number.isSafeInteger(saved?.stars?.[subject]) && saved.stars[subject] >= 0) player.stars[subject] = saved.stars[subject];
+  }
+} catch { /* Play remains available without browser storage. */ }
+let subject;
+let mode;
+let deck = [];
+let question;
+let solved;
+function savePlayer() {
+  try { localStorage.setItem(playerKey,JSON.stringify(player)); return true; }
+  catch { return false; }
+}
+function renderPlayerStars() {
+  const count = Object.values(player.stars).reduce((sum,total) => sum + total,0);
+  $('home-stars').textContent = '⭐ 내 별 ' + count + '개';
+  if (subject) $('game-stars').textContent = '⭐ ' + player.stars[subject] + '개';
+}
+function renderPlayerName() {
+  const title = $('home-title');
+  if (player.name) title.textContent = player.name + '의 놀이터';
+  else title.replaceChildren('오늘은 뭐 하고',document.createElement('br'),'놀까?');
+  $('player-name').value = player.name;
+}
+$('player-form').addEventListener('submit',(event) => {
+  event.preventDefault();
+  player.name = $('player-name').value.trim().slice(0,12);
+  const saved = savePlayer();
+  renderPlayerName();
+  $('player-status').textContent = saved ? '놀이터 이름을 저장했어요.' : '이 화면에서 사용할 이름을 바꿨어요.';
+});
+function renderQuestionPicture(card) {
+  const picture = $('picture');
+  picture.replaceChildren();
+  picture.classList.toggle('counting',Boolean(card.groups || card.numberLine));
+  picture.setAttribute('role','img');
+  picture.setAttribute('aria-label',card.description || card.picture);
+  if (card.groups) {
+    card.groups.forEach((icons,index) => {
+      if (index) picture.append(element('span','+'));
+      const group = element('span','','number-group');
+      group.append(...icons.map((icon) => element('span',icon)));
+      picture.append(group);
+    });
+    return;
+  }
+  const contents = element('span',card.picture);
+  if (card.caption) contents.append(element('span',card.caption,'picture-caption'));
+  picture.append(contents);
 }
 function nextQuestion() {
   stopAudio();
   if (!deck.length) {
-    deck = shuffled(mode === 'words' ? WORDS : LETTERS);
+    deck = shuffled(mode.cards);
     if (deck[0] === question) deck.push(deck.shift());
   }
   question = deck.shift();
   solved = false;
-  const words = mode === 'words';
-  $('prompt').textContent = words ? '그림에 맞는 낱말을 찾아요' : '자음과 모음을 합치면 어떤 글자가 될까요?';
-  $('picture').textContent = words ? question[1] : question[1] + ' + ' + question[2];
-  $('picture').setAttribute('role', 'img');
-  $('picture').setAttribute('aria-label', words ? question[0] + ' 그림' : question[1] + ' 더하기 ' + question[2]);
-  const alternatives = words ? WORDS : LETTERS;
-  const options = shuffled([question,...shuffled(alternatives.filter((value) => value !== question)).slice(0,2)]);
+  $('prompt').textContent = mode.prompt;
+  renderQuestionPicture(question);
+  const alternatives = Array.from(new Set(mode.cards.map((card) => card.answer))).filter((value) => value !== question.answer);
+  const options = shuffled([question.answer,...shuffled(alternatives).slice(0,2)]);
   $('feedback').textContent = '';
-  $('options').replaceChildren(...options.map(([label]) => {
+  $('game-stars').classList.remove('earned');
+  $('options').replaceChildren(...options.map((label) => {
     const choice = button(label, () => {
       if (solved) return;
-      if (label === question[0]) {
+      if (label === question.answer) {
         solved = true;
+        player.stars[subject]++;
+        savePlayer();
+        renderPlayerStars();
+        $('game-stars').classList.add('earned');
         choice.classList.add('good');
-        $('feedback').textContent = '맞았어요! ' + label;
+        $('feedback').textContent = '맞았어요! ' + label + ' ⭐';
         $('options').querySelectorAll('button').forEach((option) => { option.disabled = option !== choice; });
       } else {
         choice.classList.add('retry');
         $('feedback').textContent = '한 번 더 골라볼까요?';
       }
     }, 'option');
+    if (subject === 'english') choice.lang = 'en';
     return choice;
   }));
 }
-function changeMode(newMode) {
-  if (mode === newMode) return;
+function changeMode(newMode,force = false) {
+  if (!force && mode === newMode) return;
   mode = newMode;
   deck = [];
-  $('words-mode').setAttribute('aria-pressed', mode === 'words');
-  $('letters-mode').setAttribute('aria-pressed', mode === 'letters');
+  Array.from($('game-modes').children).forEach((option,index) => {
+    option.setAttribute('aria-pressed',GAME_MODES[subject][index] === mode);
+  });
   nextQuestion();
 }
-$('words-mode').addEventListener('click', () => changeMode('words'));
-$('letters-mode').addEventListener('click', () => changeMode('letters'));
-$('listen').addEventListener('click', () => listen(question[0],mode === 'words',$('feedback')));
+function showLearningGame() {
+  const section = location.hash.slice(1);
+  if (!Object.hasOwn(GAME_MODES,section)) { stopAudio(); return; }
+  if (subject === section) return;
+  subject = section;
+  $(subject).querySelector('[data-game-slot]').append($('learning-game'));
+  const modes = GAME_MODES[subject];
+  $('game-modes').replaceChildren(...modes.map((entry) => button(entry.title,() => changeMode(entry))));
+  renderPlayerStars();
+  changeMode(modes[0],true);
+}
+document.querySelectorAll('.learn-nav').forEach((menu) => {
+  menu.replaceChildren(...Object.entries(LEARNING_PAGES).map(([key,title]) => {
+    const link = element('a',title);
+    link.href = '#' + key;
+    return link;
+  }));
+});
+$('listen').addEventListener('click', () => listen(question.voice || question.answer,Boolean(mode.recorded),$('feedback'),subject === 'english' ? 'en-US' : 'ko-KR'));
 $('next').addEventListener('click', nextQuestion);
-nextQuestion();
+window.addEventListener('hashchange',showLearningGame);
+showPage(false);
+renderPlayerName();
+renderPlayerStars();
+showLearningGame();
 
 let database;
 function openVoiceDatabase() {
@@ -646,7 +831,110 @@ const ANIMALS = [
       ['오른쪽 발','M269 267 Q303 272 289 288 Q276 301 239 285']
     ],
     details:'M183 125 a5 8 0 1 0 10 0 a5 8 0 1 0 -10 0 M247 125 a5 8 0 1 0 10 0 a5 8 0 1 0 -10 0 M204 145 Q220 131 236 145 L220 158 Z'
+  },
+  {
+    name:'강아지',icon:'🐶',glow:'#ffc08a',fill:'#72543b',
+    parts:[
+      ['얼굴','M220 90 C152 90 111 139 113 196 C115 251 161 279 220 279 C279 279 325 251 327 196 C329 139 288 90 220 90 Z',true],
+      ['왼쪽 귀','M151 107 C107 83 70 122 76 177 C82 228 115 222 122 180'],
+      ['오른쪽 귀','M289 107 C333 83 370 122 364 177 C358 228 325 222 318 180'],
+      ['입','M181 228 Q201 254 220 228 Q239 254 259 228']
+    ],
+    details:'M161 171a8 10 0 1 0 16 0a8 10 0 1 0-16 0 M263 171a8 10 0 1 0 16 0a8 10 0 1 0-16 0 M203 209 Q220 197 237 209 Q234 222 220 229 Q206 222 203 209Z'
+  },
+  {
+    name:'사자',icon:'🦁',glow:'#ffce72',fill:'#855131',
+    parts:[
+      ['갈기','M220 39 Q257 23 273 61 Q316 48 326 89 Q369 91 363 138 Q396 163 363 192 Q377 237 333 243 Q316 282 276 268 Q254 305 220 283 Q186 305 164 268 Q124 282 107 243 Q63 237 77 192 Q44 163 77 138 Q71 91 114 89 Q124 48 167 61 Q183 23 220 39 Z',true],
+      ['얼굴','M220 91 C164 91 132 124 132 177 C132 225 170 248 220 248 C270 248 308 225 308 177 C308 124 276 91 220 91 Z'],
+      ['입','M182 207 Q200 228 220 207 Q240 228 258 207']
+    ],
+    details:'M170 153a7 9 0 1 0 14 0a7 9 0 1 0-14 0 M256 153a7 9 0 1 0 14 0a7 9 0 1 0-14 0 M205 187 Q220 177 235 187 Q228 201 220 205 Q212 201 205 187Z'
+  },
+  {
+    name:'코끼리',icon:'🐘',glow:'#a8bbff',fill:'#464972',
+    parts:[
+      ['왼쪽 귀','M159 86 C105 44 59 77 65 137 C68 186 111 227 152 194',true],
+      ['오른쪽 귀','M281 86 C335 44 381 77 375 137 C372 186 329 227 288 194',true],
+      ['얼굴과 코','M220 65 C172 65 139 103 139 149 Q141 197 197 212 L197 253 C197 283 227 291 248 274 Q271 254 254 233 Q245 247 236 245 L236 210 C277 204 301 182 301 149 C301 103 268 65 220 65 Z',true],
+      ['코 주름','M198 232 Q218 214 240 232']
+    ],
+    details:'M171 141a7 10 0 1 0 14 0a7 10 0 1 0-14 0 M255 141a7 10 0 1 0 14 0a7 10 0 1 0-14 0'
+  },
+  {
+    name:'기린',icon:'🦒',glow:'#ffce94',fill:'#85522f',
+    parts:[
+      ['귀와 얼굴','M180 149 Q145 130 140 97 Q163 92 184 110 L183 75 Q167 58 185 46 Q201 40 204 63 L205 88 Q220 85 235 88 L236 63 Q239 40 255 46 Q273 58 257 75 L256 110 Q277 92 300 97 Q295 130 260 149 Q255 183 220 187 Q185 183 180 149 Z',true],
+      ['긴 목','M202 183 L180 278 Q220 299 260 278 L238 183',true],
+      ['목 무늬','M210 207 L228 210 L235 229 L217 239 L202 225 Z']
+    ],
+    details:'M193 136a5 7 0 1 0 10 0a5 7 0 1 0-10 0 M237 136a5 7 0 1 0 10 0a5 7 0 1 0-10 0 M199 157 Q220 145 241 157 Q236 177 220 177 Q204 177 199 157Z M213 253l16-4 10 15-11 13-17-6Z'
+  },
+  {
+    name:'판다',icon:'🐼',glow:'#d8ceff',fill:'#564e74',
+    parts:[
+      ['왼쪽 귀','M140 122 C106 114 106 69 134 55 C163 44 184 63 183 89',true],
+      ['오른쪽 귀','M257 89 C256 63 277 44 306 55 C334 69 334 114 300 122',true],
+      ['얼굴','M220 77 C150 77 103 125 103 184 C103 247 151 278 220 278 C289 278 337 247 337 184 C337 125 290 77 220 77 Z',true],
+      ['입','M191 220 Q205 240 220 220 Q235 240 249 220']
+    ],
+    details:'M171 142 C134 150 134 194 166 197 C195 197 202 148 171 142Z M269 142 C306 150 306 194 274 197 C245 197 238 148 269 142Z M209 194 Q220 187 231 194 Q229 205 220 208 Q211 205 209 194Z'
+  },
+  {
+    name:'공룡',icon:'🦕',glow:'#b7f98e',fill:'#426647',
+    parts:[
+      ['몸과 꼬리','M63 218 Q110 245 144 212 C176 166 225 147 268 175 Q276 153 279 114 C283 76 308 57 341 63 Q379 69 378 96 Q375 117 335 117 L323 209 Q300 252 260 250 L255 279 L222 279 L220 251 Q197 253 179 245 L171 279 L136 279 L141 246 Q95 259 63 218 Z',true],
+      ['등 무늬','M151 207 Q143 185 162 175 Q177 169 182 188 Q188 151 207 150 Q223 150 221 175 Q235 143 250 153 Q261 159 257 173'],
+      ['입','M334 100 Q354 105 371 91']
+    ],
+    details:'M330 82a7 7 0 1 0 14 0a7 7 0 1 0-14 0 M178 211a9 8 0 1 0 18 0a9 8 0 1 0-18 0 M215 199a7 7 0 1 0 14 0a7 7 0 1 0-14 0 M244 219a9 8 0 1 0 18 0a9 8 0 1 0-18 0'
+  },
+  {
+    name:'나비',icon:'🦋',glow:'#ff9fe4',fill:'#764a81',
+    parts:[
+      ['왼쪽 날개','M213 145 C170 60 88 42 82 102 C76 143 115 175 158 172 C122 194 114 241 140 259 C172 280 204 232 216 189 Z',true],
+      ['오른쪽 날개','M227 145 C270 60 352 42 358 102 C364 143 325 175 282 172 C318 194 326 241 300 259 C268 280 236 232 224 189 Z',true],
+      ['더듬이','M185 98 Q214 99 220 136 Q226 99 255 98'],
+      ['몸','M220 136 L220 218']
+    ],
+    details:'M124 110a23 18 0 1 0 46 0a23 18 0 1 0-46 0 M270 110a23 18 0 1 0 46 0a23 18 0 1 0-46 0 M148 215a14 18 0 1 0 28 0a14 18 0 1 0-28 0 M264 215a14 18 0 1 0 28 0a14 18 0 1 0-28 0'
+  },
+  {
+    name:'고래',icon:'🐳',glow:'#92d8ff',fill:'#31597e',
+    parts:[
+      ['몸과 꼬리','M62 166 C71 113 126 98 176 102 C233 106 279 145 301 165 Q317 181 333 177 Q313 147 338 122 Q354 149 383 145 Q380 178 345 194 C319 239 257 258 183 257 C107 256 51 227 62 166 Z',true],
+      ['지느러미','M189 196 Q214 220 270 216 Q235 246 210 243 Q194 234 189 196'],
+      ['물줄기','M162 97 Q145 70 118 69 Q123 41 149 52 Q161 61 162 78 Q170 26 194 44 Q213 64 174 98'],
+      ['미소','M85 184 Q112 211 143 181']
+    ],
+    details:'M117 158a7 9 0 1 0 14 0a7 9 0 1 0-14 0'
+  },
+  {
+    name:'거북이',icon:'🐢',glow:'#a8f0a9',fill:'#3e694d',
+    parts:[
+      ['등딱지','M102 223 C108 140 151 91 214 91 C280 91 320 143 326 223 Q217 247 102 223 Z',true],
+      ['머리','M321 172 Q354 143 377 172 Q398 206 370 222 Q349 234 326 223',true],
+      ['왼쪽 발과 꼬리','M102 216 Q77 197 54 213 Q68 233 105 230 Q117 260 138 264 Q163 263 155 235'],
+      ['오른쪽 발','M265 235 Q265 265 287 262 Q306 261 310 229'],
+      ['등 무늬','M171 155 L215 129 L261 155 L262 198 L215 223 L168 198 Z']
+    ],
+    details:'M357 181a6 7 0 1 0 12 0a6 7 0 1 0-12 0 M356 204 Q367 199 372 205 Q363 213 356 204Z'
+  },
+  {
+    name:'돌고래',icon:'🐬',glow:'#8ceaff',fill:'#286777',
+    parts:[
+      ['몸과 꼬리','M84 173 Q102 158 126 154 C147 99 199 72 249 88 L280 52 Q294 84 278 104 C322 128 337 163 341 206 Q363 206 381 222 Q363 243 341 231 Q324 262 293 261 Q303 238 321 222 C296 167 262 145 220 147 Q201 190 160 184 Q133 184 117 181 Q93 194 84 173 Z',true],
+      ['지느러미','M219 146 Q246 149 268 182 Q235 193 202 176'],
+      ['물결','M82 248 Q113 228 143 248 Q173 268 203 248 Q231 228 259 248']
+    ],
+    details:'M148 151a7 7 0 1 0 14 0a7 7 0 1 0-14 0 M111 170 Q123 164 138 172 Q123 178 111 170Z'
   }
+];
+const ANIMAL_GROUPS = [
+  {title:'가까운 친구',names:['토끼','고양이','강아지','나비']},
+  {title:'숲속 친구',names:['곰','여우','판다']},
+  {title:'큰 동물',names:['사자','코끼리','기린','공룡']},
+  {title:'물가 친구',names:['펭귄','고래','거북이','돌고래']}
 ];
 const TRACE_SPACING = 4;
 const TRACE_RADIUS = 22;
@@ -655,7 +943,12 @@ const traceBoard = $('trace-board');
 const tracePicture = $('trace-picture');
 const traceBeacon = $('trace-beacon');
 const traceStates = ANIMALS.map(() => ({part:0, sample:0}));
+const animalKey = 'family-playroom-drawn-animals';
 const finishedAnimals = new Set();
+try {
+  const names = JSON.parse(localStorage.getItem(animalKey));
+  if (Array.isArray(names)) ANIMALS.forEach(({name},index) => { if (names.includes(name)) finishedAnimals.add(index); });
+} catch { /* The drawing works without saved badges. */ }
 let animalIndex = 0;
 let traceParts;
 let tracePointer;
@@ -696,7 +989,23 @@ function mountAnimal(index) {
     return {label,guide,lines:[neon,shine],length,samples};
   });
   $('trace-meter').replaceChildren(...traceParts.map(() => element('span')));
+  renderAnimalChoices();
   renderTrace();
+}
+
+function renderAnimalChoices() {
+  const group = ANIMAL_GROUPS.find(({names}) => names.includes(ANIMALS[animalIndex].name));
+  $('animal-picker').style.setProperty('--animal-count',group.names.length);
+  Array.from($('animal-groups').children).forEach((option,index) => {
+    option.setAttribute('aria-pressed',ANIMAL_GROUPS[index] === group);
+  });
+  Array.from($('animal-picker').children).forEach((option,index) => {
+    option.hidden = !group.names.includes(ANIMALS[index].name);
+    option.setAttribute('aria-pressed',index === animalIndex);
+    const finished = finishedAnimals.has(index);
+    option.setAttribute('aria-label',ANIMALS[index].name + (finished ? ' 완성' : ''));
+    option.querySelector('.animal-check').textContent = finished ? '✓' : '';
+  });
 }
 
 function renderTrace() {
@@ -729,12 +1038,6 @@ function renderTrace() {
   $('trace-count').textContent = '완성 ' + finishedAnimals.size + ' / ' + ANIMALS.length;
   $('trace-reset').disabled = state.part === 0 && state.sample === 0;
   $('trace-next').hidden = !complete;
-  Array.from($('animal-picker').children).forEach((option,index) => {
-    option.setAttribute('aria-pressed',index === animalIndex);
-    const finished = finishedAnimals.has(index);
-    option.setAttribute('aria-label',ANIMALS[index].name + (finished ? ' 완성' : ''));
-    option.querySelector('.animal-check').textContent = finished ? '✓' : '';
-  });
 }
 
 function tracePoint(event) {
@@ -778,7 +1081,13 @@ traceSvg.addEventListener('pointermove',(event) => {
     state.part++;
     state.sample = 0;
     tracePointer = undefined;
-    if (state.part === traceParts.length) finishedAnimals.add(animalIndex);
+    if (state.part === traceParts.length) {
+      finishedAnimals.add(animalIndex);
+      try {
+        localStorage.setItem(animalKey,JSON.stringify(Array.from(finishedAnimals,(index) => ANIMALS[index].name)));
+      } catch { /* Keep the badge for the current visit. */ }
+      renderAnimalChoices();
+    }
   }
   renderTrace();
 });
@@ -796,6 +1105,13 @@ ANIMALS.forEach(({icon,name},index) => {
   check.setAttribute('aria-hidden','true');
   option.append(emoji,element('span',name),check);
   $('animal-picker').append(option);
+});
+ANIMAL_GROUPS.forEach((group) => {
+  const option = button(group.title,() => {
+    if (group.names.includes(ANIMALS[animalIndex].name)) return;
+    mountAnimal(ANIMALS.findIndex(({name}) => group.names[0] === name));
+  });
+  $('animal-groups').append(option);
 });
 $('trace-reset').addEventListener('click',() => {
   traceStates[animalIndex] = {part:0,sample:0};
