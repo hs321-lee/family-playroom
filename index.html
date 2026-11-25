@@ -55,6 +55,7 @@ p { line-height:1.65; }
 .jump:nth-child(5) .jump-icon { color:#a04431; background:#ffe4d7; }
 .jump:nth-child(6) .jump-icon { color:#1f6652; background:#d9f2e7; }
 .jump:nth-child(7) .jump-icon { color:#553e9b; background:#efe6ff; }
+.jump:nth-child(8) .jump-icon { color:#72511b; background:#fff0c4; }
 .jump p { margin-bottom:0; }
 .panel { background:white; border:1px solid var(--line); border-radius:21px; padding:25px; margin-top:16px; }
 .section-head { display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:13px; }
@@ -147,6 +148,29 @@ canvas { display:block; width:100%; height:auto; background:#fff; border:2px das
 .trace-actions { justify-content:center; margin-top:8px; }
 .trace-actions .button { color:#eee4ff; background:#251e42; border-color:#544474; }
 .trace-actions .primary { color:#24153f; background:#d8c2ff; border-color:#d8c2ff; }
+.art-activity,.puzzle-panel { max-width:850px; margin-left:auto; margin-right:auto; }
+.art-activity h2,.puzzle-panel h2 { margin-bottom:5px; }
+.art-palette,.puzzle-settings { margin:12px 0; }
+.art-stage { display:block; width:min(100%,565px); height:auto; margin:12px auto 0; border:1px solid #ded5e8; border-radius:16px; background:#fffdf9; }
+.art-stage.stamping { cursor:crosshair; }
+.color-zone { cursor:pointer; }
+.color-zone:focus-visible { outline:none; stroke:#5232a8; stroke-width:5; }
+.art-activity .feedback { margin-bottom:6px; }
+.art-activity .row + .row { margin-top:8px; }
+.stamp-choice { font-size:1.48rem; min-width:45px; min-height:45px; padding:3px; }
+.puzzle-content { display:grid; grid-template-columns:minmax(100px,140px) minmax(0,540px); gap:17px; align-items:start; justify-content:center; }
+.puzzle-example { margin:0; color:var(--muted); font-size:.91rem; font-weight:800; }
+.puzzle-example img { display:block; width:100%; border-radius:9px; margin-top:5px; background:#f5edf9; }
+.puzzle-grid { display:grid; grid-template-columns:repeat(var(--puzzle-side,2),minmax(0,1fr)); gap:4px; padding:6px; border-radius:13px; background:#e5ddf3; }
+.puzzle-tile { min-width:0; aspect-ratio:4 / 3; padding:0; border:0; border-radius:4px; background-repeat:no-repeat; outline-offset:-4px; }
+.puzzle-tile[aria-pressed="true"] { outline:4px solid #572acc; box-shadow:inset 0 0 0 6px #fff9; }
+.puzzle-grid.complete { gap:0; background:#d8f5e5; animation:trace-pop .6s both; }
+.puzzle-grid.complete .puzzle-tile { border-radius:0; opacity:1; }
+.memory-board { display:grid; grid-template-columns:repeat(var(--memory-cols,3),minmax(0,1fr)); gap:8px; max-width:580px; margin:14px auto 0; }
+.memory-card { min-height:clamp(60px,14vw,100px); border:2px solid #cebef1; border-radius:13px; background:#ede3ff; color:#5c408d; font-weight:850; font-size:clamp(1.6rem,5vw,3rem); }
+.memory-card.open { background:#fff8e8; border-color:#e9c777; }
+.memory-card.matched { background:#e2f4e8; border-color:#7db592; color:#285d41; opacity:1; }
+.puzzle-caption { margin:0; }
 .trace-reward { display:flex; align-items:center; justify-content:center; gap:10px; margin:9px 0 0; font-weight:800; }
 .trace-reward:not([hidden]) { animation:trace-pop .7s both; }
 .sticker-art { width:64px; height:64px; flex:0 0 auto; display:grid; place-items:center; border-radius:16px; background:#fff3cc; border:1px solid #eacb7e; font-size:2rem; overflow:hidden; }
@@ -202,6 +226,9 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
   .ebs-list article p { min-height:0; }
   .animal-picker { grid-template-columns:repeat(var(--animal-count,4),minmax(0,1fr)); }
   .game-toolbar { justify-content:center; }
+  .puzzle-content { grid-template-columns:1fr; gap:8px; }
+  .puzzle-example { display:flex; align-items:center; gap:8px; }
+  .puzzle-example img { order:-1; width:94px; margin:0; }
 }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none !important; animation:none !important; } }
 </style>
@@ -210,7 +237,7 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
 <header><div class="bar">
   <a class="brand" href="#home"><span class="logo" aria-hidden="true">✿</span> 우리집 놀이터</a>
   <nav aria-label="주 메뉴" id="main-menu">
-    <a href="#hangul">배움놀이</a><a href="#art">미술놀이</a><a href="#family">가족 대시보드</a><a href="#routine">오늘 할 일</a>
+    <a href="#hangul">배움놀이</a><a href="#art">미술놀이</a><a href="#puzzle">퍼즐</a><a href="#family">가족 대시보드</a><a href="#routine">오늘 할 일</a>
   </nav>
 </div></header>
 <main>
@@ -223,7 +250,8 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
     <a class="jump" href="#hangul"><span class="jump-icon" aria-hidden="true">ㄱ</span><h3>한글놀이</h3><p class="small">그림을 보고 낱말 카드를 찾아요.</p></a>
     <a class="jump" href="#numbers"><span class="jump-icon" aria-hidden="true">123</span><h3>숫자놀이</h3><p class="small">그림을 세고 빠진 숫자를 찾아요.</p></a>
     <a class="jump" href="#english"><span class="jump-icon" aria-hidden="true">ABC</span><h3>영어놀이</h3><p class="small">알파벳과 그림 단어를 맞혀요.</p></a>
-    <a class="jump" href="#art"><span class="jump-icon" aria-hidden="true">✿</span><h3>미술놀이</h3><p class="small">네온 점선을 따라 동물을 그려요.</p></a>
+    <a class="jump" href="#art"><span class="jump-icon" aria-hidden="true">✿</span><h3>미술놀이</h3><p class="small">그림을 그리고 색칠과 스티커로 꾸며요.</p></a>
+    <a class="jump" href="#puzzle"><span class="jump-icon" aria-hidden="true">▧</span><h3>퍼즐놀이</h3><p class="small">그림 조각과 동물 카드의 짝을 맞혀요.</p></a>
     <a class="jump" href="#family"><span class="jump-icon" aria-hidden="true">▦</span><h3>가족 대시보드</h3><p class="small">우리 일정과 주말 나들이를 모아봐요.</p></a>
     <a class="jump" href="#routine"><span class="jump-icon" aria-hidden="true">★</span><h3>오늘 할 일</h3><p class="small">아침·저녁 할 일을 하고 스티커를 받아요.</p></a>
     <a class="jump" href="#ebs"><span class="jump-icon" aria-hidden="true">▶</span><h3>EBS 영상</h3><p class="small">한글·수학·영어 영상을 골라 봐요.</p></a>
@@ -287,6 +315,8 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
     <h1 class="page-title" tabindex="-1">미술놀이</h1>
     <div class="row" aria-label="미술놀이 종류">
       <button class="button" id="trace-mode" type="button" aria-pressed="true">동물 따라 그리기</button>
+      <button class="button" id="coloring-mode" type="button" aria-pressed="false">색칠하기</button>
+      <button class="button" id="sticker-art-mode" type="button" aria-pressed="false">스티커 꾸미기</button>
       <button class="button" id="free-mode" type="button" aria-pressed="false">자유 그리기</button>
     </div>
   </div>
@@ -321,6 +351,54 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
       <div class="row"><button class="button" id="undo" type="button" disabled>되돌리기</button><button class="button" id="clear" type="button" disabled>지우기</button><button class="button primary" id="save-art" type="button" disabled>그림 저장</button></div>
     </div>
     <canvas id="drawing" width="900" height="520" aria-label="그림판">손가락이나 마우스로 그림을 그려요.</canvas>
+  </div>
+  <div class="panel art-activity" id="coloring-art" hidden>
+    <h2>색칠하기</h2><p class="small">색을 고르고 그림 속 칸을 눌러요.</p>
+    <div class="row" id="coloring-choices" aria-label="색칠할 그림"></div>
+    <div class="row art-palette" id="coloring-palette" aria-label="색칠할 색"></div>
+    <svg id="coloring-board" class="art-stage" viewBox="0 0 400 300" role="group" aria-label="색칠 그림판"></svg>
+    <p id="coloring-status" class="feedback" role="status"></p>
+    <div class="row"><button class="button" id="coloring-undo" type="button">되돌리기</button><button class="button primary" id="coloring-save" type="button">색칠 그림 저장</button></div>
+  </div>
+  <div class="panel art-activity" id="sticker-art" hidden>
+    <h2>스티커 꾸미기</h2><p class="small">스티커를 고르고 배경에 붙여요.</p>
+    <div class="row" id="sticker-scenes" aria-label="배경 고르기"></div>
+    <div class="row" id="sticker-options" aria-label="스티커 고르기"></div>
+    <svg class="art-stage stamping" id="sticker-board" viewBox="0 0 400 300" role="group" aria-label="스티커 그림판"><g id="sticker-background"></g><g id="stamp-layer" pointer-events="none"></g></svg>
+    <div class="row art-palette">
+      <button class="button" id="sticker-center" type="button">가운데에 붙이기</button>
+      <button class="button" id="stamp-undo" type="button">되돌리기</button>
+      <button class="button primary" id="stamp-save" type="button">스티커 그림 저장</button>
+    </div>
+    <p id="stamp-status" class="feedback" role="status"></p>
+  </div>
+</section>
+<section id="puzzle" hidden>
+  <div class="section-head">
+    <h1 class="page-title" tabindex="-1">퍼즐놀이</h1>
+    <div class="row"><span class="game-stars" id="puzzle-stars"></span><button class="button" id="picture-mode" type="button" aria-pressed="true">그림 퍼즐</button><button class="button" id="memory-mode" type="button" aria-pressed="false">동물 짝 찾기</button></div>
+  </div>
+  <div class="panel puzzle-panel" id="picture-puzzle">
+    <h2>그림 맞추기</h2><p class="small puzzle-caption">조각 두 개를 차례로 눌러 자리를 바꿔요.</p>
+    <div class="row puzzle-settings">
+      <button class="button" id="picture-easy" type="button" aria-pressed="true">4조각</button><button class="button" id="picture-hard" type="button" aria-pressed="false">9조각</button>
+      <label class="field" for="puzzle-scene">그림 고르기</label><select id="puzzle-scene"></select>
+      <button class="button" id="picture-restart" type="button">다시 섞기</button>
+    </div>
+    <div class="puzzle-content">
+      <figure class="puzzle-example"><figcaption>완성 그림</figcaption><img id="puzzle-example" alt=""></figure>
+      <div class="puzzle-grid" id="puzzle-grid" aria-label="그림 조각"></div>
+    </div>
+    <p class="feedback" id="picture-status" role="status"></p>
+  </div>
+  <div class="panel puzzle-panel" id="memory-puzzle" hidden>
+    <h2>동물 짝 찾기</h2><p class="small puzzle-caption">카드 두 장을 뒤집어서 같은 동물을 찾아요.</p>
+    <div class="row puzzle-settings">
+      <button class="button" id="memory-easy" type="button" aria-pressed="true">3쌍</button><button class="button" id="memory-hard" type="button" aria-pressed="false">6쌍</button>
+      <button class="button" id="memory-restart" type="button">다시 섞기</button>
+    </div>
+    <div class="memory-board" id="memory-board" aria-label="뒤집기 카드"></div>
+    <p class="feedback" id="memory-status" role="status"></p>
   </div>
 </section>
 <section id="family" hidden>
@@ -423,7 +501,7 @@ function button(label, onClick, className = 'button') {
 }
 function showPage(focus) {
   const requested = location.hash.slice(1);
-  const sections = ['home','art','family','routine',...Object.keys(LEARNING_PAGES)];
+  const sections = ['home','art','puzzle','family','routine',...Object.keys(LEARNING_PAGES)];
   const section = sections.includes(requested) ? requested : 'home';
   sections.forEach((key) => { $(key).hidden = section !== key; });
   document.querySelectorAll('nav a').forEach((link) => {
@@ -514,7 +592,7 @@ const GAME_MODES = {
   ]
 };
 const playerKey = 'family-playroom-player';
-const player = {name:'',stars:{hangul:0,numbers:0,english:0}};
+const player = {name:'',stars:{hangul:0,numbers:0,english:0,puzzle:0}};
 try {
   const saved = JSON.parse(localStorage.getItem(playerKey));
   if (typeof saved?.name === 'string') player.name = saved.name.slice(0,12);
@@ -535,6 +613,12 @@ function renderPlayerStars() {
   const count = Object.values(player.stars).reduce((sum,total) => sum + total,0);
   $('home-stars').textContent = '⭐ 내 별 ' + count + '개';
   if (subject) $('game-stars').textContent = '⭐ ' + player.stars[subject] + '개';
+  $('puzzle-stars').textContent = '⭐ ' + player.stars.puzzle + '개';
+}
+function awardPlayerStar(group) {
+  player.stars[group]++;
+  savePlayer();
+  renderPlayerStars();
 }
 function renderPlayerName() {
   const title = $('home-title');
@@ -587,9 +671,7 @@ function nextQuestion() {
       if (solved) return;
       if (label === question.answer) {
         solved = true;
-        player.stars[subject]++;
-        savePlayer();
-        renderPlayerStars();
+        awardPlayerStar(subject);
         $('game-stars').classList.add('earned');
         choice.classList.add('good');
         $('feedback').textContent = '맞았어요! ' + label + ' ⭐';
@@ -1122,16 +1204,16 @@ $('trace-next').addEventListener('click',() => {
   mountAnimal(indices.find((index) => !finishedAnimals.has(index)) ?? indices[0]);
   $('animal-picker').children[animalIndex].focus();
 });
-function showArtMode(tracing) {
-  $('trace-game').hidden = !tracing;
-  $('free-art').hidden = tracing;
-  $('trace-mode').setAttribute('aria-pressed',tracing);
-  $('free-mode').setAttribute('aria-pressed',!tracing);
+const ART_MODES = {'trace-mode':'trace-game','coloring-mode':'coloring-art','sticker-art-mode':'sticker-art','free-mode':'free-art'};
+function showArtMode(mode) {
+  for (const [key,section] of Object.entries(ART_MODES)) {
+    $(section).hidden = key !== mode;
+    $(key).setAttribute('aria-pressed',key === mode);
+  }
   tracePointer = undefined;
-  if (tracing && !traceParts) mountAnimal(animalIndex);
+  if (mode === 'trace-mode' && !traceParts) mountAnimal(animalIndex);
 }
-$('trace-mode').addEventListener('click',() => showArtMode(true));
-$('free-mode').addEventListener('click',() => showArtMode(false));
+for (const mode of Object.keys(ART_MODES)) $(mode).addEventListener('click',() => showArtMode(mode));
 function startTraceOnArtPage() {
   if (!$('art').hidden && !traceParts) mountAnimal(animalIndex);
 }
@@ -1225,6 +1307,355 @@ $('save-art').addEventListener('click', () => {
   link.click();
 });
 paint();
+
+const PLAY_SCENES = [
+  {
+    name:'꽃밭',
+    background:
+      '<rect width="400" height="300" fill="#d8efff"/>' +
+      '<circle cx="72" cy="55" r="32" fill="#ffcc61"/>' +
+      '<path d="M0 177Q81 99 194 180T400 134V300H0Z" fill="#8abf87"/>' +
+      '<path d="M0 210Q108 171 204 231T400 185V300H0Z" fill="#bbe299"/>' +
+      '<path d="M282 145h21v78h-21z" fill="#967355"/>' +
+      '<path d="M261 151c-42-16-10-67 15-63 7-36 55-29 66 8 30 13 27 58-12 62z" fill="#39916d"/>' +
+      '<path d="M19 158q18-28 37 0q15-12 27 9H14Z M225 52q13-24 28-5q18-20 34 10h-65Z" fill="#fffaf4"/>' +
+      '<path d="M75 260l21-46m30 50l5-33m220 33l-6-44" stroke="#3a946f" stroke-width="5" stroke-linecap="round"/>' +
+      '<circle cx="97" cy="213" r="12" fill="#ee89bb"/><circle cx="131" cy="232" r="10" fill="#ffca60"/><circle cx="344" cy="220" r="12" fill="#b387e7"/>',
+    picture:[['🐰',124,163,66],['🦋',235,132,54],['🌼',246,255,50]]
+  },
+  {
+    name:'바닷속',
+    background:
+      '<rect width="400" height="300" fill="#aee6f4"/>' +
+      '<path d="M0 33q40-17 80 0t80 0t80 0t80 0t80 0v82H0z" fill="#81cfec"/>' +
+      '<path d="M0 122q42-47 108-15t109 0t183 10v160H0z" fill="#64b9d0"/>' +
+      '<path d="M0 250q64-36 134-20t163 0t103 11v59H0z" fill="#f8d7a2"/>' +
+      '<path d="M45 261q-20-32 0-72m1 72q32-33 21-69m228 74q-14-53 13-85m6 84q32-31 31-56" stroke="#478a75" stroke-width="9" fill="none" stroke-linecap="round"/>' +
+      '<circle cx="79" cy="105" r="14" fill="#d9f8fd"/><circle cx="104" cy="70" r="7" fill="#d9f8fd"/><circle cx="330" cy="105" r="11" fill="#d9f8fd"/>' +
+      '<path d="M181 260l14-26 15 24 28 3-21 18 5 16-26-9-24 9 6-20-20-13z" fill="#eead9d"/>',
+    picture:[['🐠',112,151,70],['🐙',278,167,82],['🐚',331,277,43]]
+  },
+  {
+    name:'우주',
+    background:
+      '<rect width="400" height="300" fill="#282a66"/>' +
+      '<path d="M0 238Q87 181 169 241T400 213V300H0Z" fill="#756bc4"/>' +
+      '<path d="M0 264Q75 236 163 275T400 253V300H0Z" fill="#6354aa"/>' +
+      '<circle cx="88" cy="77" r="47" fill="#ffbd74"/><circle cx="71" cy="64" r="13" fill="#e79968"/>' +
+      '<path d="M31 94c-14 26 122-12 127-38" stroke="#ffe4a2" stroke-width="9" fill="none" stroke-linecap="round"/>' +
+      '<circle cx="321" cy="88" r="28" fill="#a8d9f7"/><circle cx="317" cy="78" r="9" fill="#76b5db"/>' +
+      '<path d="M236 33l5 10 11 2-8 8 2 12-10-6-10 6 2-12-8-8 11-2z M363 145l4 9 10 2-7 7 2 9-9-5-9 5 2-9-7-7 10-2z" fill="#ffe69b"/>' +
+      '<circle cx="64" cy="162" r="5" fill="#e7d3fc"/><circle cx="285" cy="147" r="5" fill="#e7d3fc"/><circle cx="146" cy="37" r="6" fill="#fff1ba"/>',
+    picture:[['🚀',197,149,97],['🪐',281,225,65],['⭐',101,232,42]]
+  }
+];
+const COLORING_PAGES = [
+  {name:'물고기',background:'#e9f7ff',parts:[
+    ['꼬리','M274 146 Q315 100 356 104 L341 150 L356 201 Q310 200 274 154 Z'],
+    ['윗지느러미','M104 121 Q155 57 212 109 L192 143 Z'],
+    ['아랫지느러미','M119 172 L197 172 Q159 234 119 192 Z'],
+    ['몸통','M59 151 C100 92 214 80 277 148 C215 216 98 212 59 151 Z'],
+    ['몸통 무늬','M205 104 Q184 151 207 196 Q222 193 233 185 Q212 150 231 117 Z'],
+    ['눈','M125 135 a14 14 0 1 0 0 28 a14 14 0 1 0 0-28 Z']
+  ]},
+  {name:'로켓',background:'#f0ecff',parts:[
+    ['왼쪽 날개','M167 167 Q112 168 104 241 L166 219 Z'],
+    ['오른쪽 날개','M233 167 Q288 168 296 241 L234 219 Z'],
+    ['불꽃','M178 220 Q171 265 198 281 Q226 269 222 220 Z'],
+    ['몸통','M165 221 C150 132 161 86 200 48 C239 86 250 132 235 221 Z'],
+    ['로켓 꼭대기','M168 106 Q200 95 232 106 Q220 70 200 48 Q180 70 168 106 Z'],
+    ['동그란 창문','M200 124 a25 25 0 1 0 0 50 a25 25 0 1 0 0-50 Z']
+  ]},
+  {name:'열기구',background:'#fff3d6',parts:[
+    ['왼쪽 줄','M163 170 L171 170 L186 233 L178 233 Z'],
+    ['오른쪽 줄','M229 170 L237 170 L222 233 L214 233 Z'],
+    ['왼쪽 풍선','M200 35 C88 35 86 145 170 183 L200 183 Z'],
+    ['오른쪽 풍선','M200 35 C312 35 314 145 230 183 L200 183 Z'],
+    ['가운데 풍선','M200 35 C170 51 154 128 185 183 H215 C246 128 230 51 200 35 Z'],
+    ['바구니','M164 225 H236 L225 265 H175 Z']
+  ]}
+];
+const ART_COLORS = [['빨강','#eb667a'],['노랑','#ffcf58'],['초록','#68ba92'],['파랑','#6da7ed'],['보라','#a489df'],['분홍','#ed9eca'],['하양','#ffffff']];
+const STAMPS = [['🦕','공룡'],['🐶','강아지'],['🦋','나비'],['🐠','물고기'],['🚀','로켓'],['🌼','꽃'],['⭐','별'],['🪐','행성']];
+
+function artElement(tag,attributes) {
+  const node = document.createElementNS(traceSvg.namespaceURI,tag);
+  for (const [key,value] of Object.entries(attributes)) node.setAttribute(key,value);
+  return node;
+}
+function pressedOnly(container,index) {
+  Array.from(container.children).forEach((option,current) => option.setAttribute('aria-pressed',index === current));
+}
+async function saveArtImage(board,filename,status) {
+  const copy = board.cloneNode(true);
+  copy.setAttribute('width','800');
+  copy.setAttribute('height','600');
+  const source = new XMLSerializer().serializeToString(copy);
+  const url = URL.createObjectURL(new Blob([source],{type:'image/svg+xml;charset=utf-8'}));
+  try {
+    const image = new Image();
+    await new Promise((resolve,reject) => {
+      image.onload = resolve;
+      image.onerror = reject;
+      image.src = url;
+    });
+    const output = document.createElement('canvas');
+    output.width = 800;
+    output.height = 600;
+    output.getContext('2d').drawImage(image,0,0,800,600);
+    const link = document.createElement('a');
+    link.href = output.toDataURL('image/png');
+    link.download = filename + '.png';
+    link.click();
+    status.textContent = '그림을 저장했어요.';
+  } catch {
+    status.textContent = '그림을 저장하지 못했어요.';
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+let coloringIndex = 0;
+let coloringColor = 0;
+const coloringStates = COLORING_PAGES.map(({parts}) => ({fills:Array(parts.length).fill(''),history:[]}));
+function fillColorZone(index) {
+  const state = coloringStates[coloringIndex];
+  const color = ART_COLORS[coloringColor][1];
+  if (state.fills[index] === color) return;
+  state.history.push([index,state.fills[index]]);
+  state.fills[index] = color;
+  refreshColoring();
+}
+function refreshColoring() {
+  const {fills,history} = coloringStates[coloringIndex];
+  const zones = $('coloring-board').querySelectorAll('.color-zone');
+  zones.forEach((zone,index) => zone.setAttribute('fill',fills[index] || '#fffdf7'));
+  $('coloring-undo').disabled = !history.length;
+  $('coloring-save').disabled = !fills.some(Boolean);
+  const count = fills.filter(Boolean).length;
+  $('coloring-status').textContent = count === fills.length ? '모두 색칠했어요! ✨' : '색칠한 칸 ' + count + ' / ' + fills.length;
+}
+function openColoring(index) {
+  coloringIndex = index;
+  const page = COLORING_PAGES[index];
+  const board = $('coloring-board');
+  board.setAttribute('aria-label',page.name + ' 색칠 그림판');
+  board.replaceChildren(artElement('rect',{width:400,height:300,fill:page.background}));
+  page.parts.forEach(([name,d],partIndex) => {
+    const zone = artElement('path',{d,stroke:'#514c76','stroke-width':3,'stroke-linejoin':'round',class:'color-zone',tabindex:0,role:'button','aria-label':name + ' 색칠하기'});
+    zone.addEventListener('click',() => fillColorZone(partIndex));
+    zone.addEventListener('keydown',(event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        fillColorZone(partIndex);
+      }
+    });
+    board.append(zone);
+  });
+  pressedOnly($('coloring-choices'),index);
+  refreshColoring();
+}
+COLORING_PAGES.forEach(({name},index) => $('coloring-choices').append(button(name,() => openColoring(index))));
+ART_COLORS.forEach(([name,color],index) => {
+  const choice = button('',() => {
+    coloringColor = index;
+    pressedOnly($('coloring-palette'),index);
+  },'swatch');
+  choice.style.setProperty('--swatch',color);
+  choice.setAttribute('aria-label',name);
+  $('coloring-palette').append(choice);
+});
+pressedOnly($('coloring-palette'),coloringColor);
+openColoring(0);
+$('coloring-undo').addEventListener('click',() => {
+  const state = coloringStates[coloringIndex];
+  const change = state.history.pop();
+  if (change) state.fills[change[0]] = change[1];
+  refreshColoring();
+});
+$('coloring-save').addEventListener('click',() => saveArtImage($('coloring-board'),COLORING_PAGES[coloringIndex].name + '-색칠',$('coloring-status')));
+
+let stickerScene = 0;
+let stampIndex = 0;
+const artStamps = [];
+function openStickerScene(index) {
+  stickerScene = index;
+  $('sticker-background').innerHTML = PLAY_SCENES[index].background;
+  pressedOnly($('sticker-scenes'),index);
+}
+function refreshStamps() {
+  const layer = $('stamp-layer');
+  layer.replaceChildren(...artStamps.map(([icon,x,y]) => {
+    const stamp = artElement('text',{x,y,'font-size':39,'text-anchor':'middle','dominant-baseline':'central'});
+    stamp.textContent = icon;
+    return stamp;
+  }));
+  $('stamp-undo').disabled = !artStamps.length;
+  $('stamp-save').disabled = !artStamps.length;
+  $('stamp-status').textContent = '붙인 스티커 ' + artStamps.length + '개';
+}
+function placeStamp(x,y) {
+  artStamps.push([STAMPS[stampIndex][0],Math.min(376,Math.max(24,x)),Math.min(276,Math.max(24,y))]);
+  refreshStamps();
+}
+PLAY_SCENES.forEach(({name},index) => $('sticker-scenes').append(button(name,() => openStickerScene(index))));
+STAMPS.forEach(([icon,name],index) => {
+  const choice = button(icon,() => {
+    stampIndex = index;
+    pressedOnly($('sticker-options'),index);
+  },'button stamp-choice');
+  choice.setAttribute('aria-label',name + ' 스티커');
+  $('sticker-options').append(choice);
+});
+$('sticker-board').addEventListener('click',(event) => {
+  const transform = $('sticker-board').getScreenCTM();
+  if (!transform) return;
+  const point = new DOMPoint(event.clientX,event.clientY).matrixTransform(transform.inverse());
+  placeStamp(point.x,point.y);
+});
+$('sticker-center').addEventListener('click',() => placeStamp(200,150));
+$('stamp-undo').addEventListener('click',() => { artStamps.pop(); refreshStamps(); });
+$('stamp-save').addEventListener('click',() => saveArtImage($('sticker-board'),PLAY_SCENES[stickerScene].name + '-스티커',$('stamp-status')));
+pressedOnly($('sticker-options'),stampIndex);
+openStickerScene(0);
+refreshStamps();
+
+function puzzlePicture(scene) {
+  const pictures = scene.picture.map(([icon,x,y,size]) => '<text x="' + x + '" y="' + y + '" font-size="' + size +
+    '" text-anchor="middle" dominant-baseline="central">' + icon + '</text>').join('');
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">' + scene.background + pictures + '</svg>');
+}
+let pictureSide = 2;
+let picturePieces = [];
+let pictureSelection;
+let pictureSolved = false;
+function selectPicturePiece(position) {
+  if (pictureSolved) return;
+  if (pictureSelection === undefined) {
+    pictureSelection = position;
+    $('picture-status').textContent = '바꿀 조각을 하나 더 눌러요.';
+  } else if (pictureSelection === position) {
+    pictureSelection = undefined;
+    $('picture-status').textContent = '';
+  } else {
+    [picturePieces[pictureSelection],picturePieces[position]] = [picturePieces[position],picturePieces[pictureSelection]];
+    pictureSelection = undefined;
+    pictureSolved = picturePieces.every((piece,index) => piece === index);
+    $('picture-status').textContent = pictureSolved ? '그림을 맞췄어요! ⭐' : '다른 조각도 맞춰볼까요?';
+    if (pictureSolved) awardPlayerStar('puzzle');
+  }
+  refreshPicture();
+}
+function refreshPicture() {
+  const grid = $('puzzle-grid');
+  grid.classList.toggle('complete',pictureSolved);
+  Array.from(grid.children).forEach((tile,index) => {
+    const piece = picturePieces[index];
+    const x = (piece % pictureSide) * 100 / (pictureSide - 1);
+    const y = Math.floor(piece / pictureSide) * 100 / (pictureSide - 1);
+    tile.style.backgroundPosition = x + '% ' + y + '%';
+    tile.setAttribute('aria-label',(piece + 1) + '번 그림 조각');
+    tile.setAttribute('aria-pressed',index === pictureSelection);
+    tile.setAttribute('aria-disabled',pictureSolved);
+  });
+}
+function startPicture(side) {
+  pictureSide = side;
+  picturePieces = shuffled(Array.from({length:side * side},(_,index) => index));
+  if (picturePieces.every((piece,index) => piece === index)) [picturePieces[0],picturePieces[1]] = [1,0];
+  pictureSelection = undefined;
+  pictureSolved = false;
+  const scene = PLAY_SCENES[Number($('puzzle-scene').value)];
+  const image = puzzlePicture(scene);
+  const preview = $('puzzle-example');
+  preview.src = image;
+  preview.alt = scene.name + ' 완성 그림';
+  const grid = $('puzzle-grid');
+  grid.style.setProperty('--puzzle-side',side);
+  grid.replaceChildren(...picturePieces.map((_,position) => {
+    const tile = button('',() => selectPicturePiece(position),'puzzle-tile');
+    tile.style.backgroundImage = 'url("' + image + '")';
+    tile.style.backgroundSize = (side * 100) + '% ' + (side * 100) + '%';
+    return tile;
+  }));
+  $('picture-easy').setAttribute('aria-pressed',side === 2);
+  $('picture-hard').setAttribute('aria-pressed',side === 3);
+  $('picture-status').textContent = '';
+  refreshPicture();
+}
+PLAY_SCENES.forEach(({name},index) => $('puzzle-scene').add(new Option(name,index)));
+$('picture-easy').addEventListener('click',() => startPicture(2));
+$('picture-hard').addEventListener('click',() => startPicture(3));
+$('picture-restart').addEventListener('click',() => startPicture(pictureSide));
+$('puzzle-scene').addEventListener('change',() => startPicture(pictureSide));
+startPicture(2);
+
+let memoryPairs = 3;
+let memoryDeck = [];
+let memoryOpen = [];
+let memoryTimer;
+const memoryFound = new Set();
+function refreshMemory() {
+  const cards = $('memory-board').children;
+  memoryDeck.forEach(({name,icon},index) => {
+    const matched = memoryFound.has(index);
+    const open = matched || memoryOpen.includes(index);
+    const card = cards[index];
+    card.textContent = open ? icon : '✦';
+    card.classList.toggle('open',open);
+    card.classList.toggle('matched',matched);
+    card.setAttribute('aria-label',open ? name + (matched ? ' 짝을 찾았어요' : '') : (index + 1) + '번 카드');
+    card.setAttribute('aria-disabled',matched);
+  });
+}
+function openMemoryCard(index) {
+  if (memoryOpen.length === 2 || memoryFound.has(index) || memoryOpen.includes(index)) return;
+  memoryOpen.push(index);
+  if (memoryOpen.length === 2) {
+    const [first,second] = memoryOpen;
+    if (memoryDeck[first].name === memoryDeck[second].name) {
+      memoryFound.add(first);
+      memoryFound.add(second);
+      memoryOpen = [];
+      const complete = memoryFound.size === memoryDeck.length;
+      $('memory-status').textContent = complete ? '모든 짝을 찾았어요! ⭐' : '같은 동물을 찾았어요!';
+      if (complete) awardPlayerStar('puzzle');
+    } else {
+      $('memory-status').textContent = '다른 동물이 나왔어요. 다시 골라봐요.';
+      memoryTimer = setTimeout(() => { memoryOpen = []; refreshMemory(); },1000);
+    }
+  } else {
+    $('memory-status').textContent = '카드 한 장을 더 골라요.';
+  }
+  refreshMemory();
+}
+function startMemory(pairs) {
+  clearTimeout(memoryTimer);
+  memoryPairs = pairs;
+  const animals = shuffled(ANIMALS).slice(0,pairs);
+  memoryDeck = shuffled([...animals,...animals]);
+  memoryOpen = [];
+  memoryFound.clear();
+  const board = $('memory-board');
+  board.style.setProperty('--memory-cols',pairs === 3 ? 3 : 4);
+  board.replaceChildren(...memoryDeck.map((_,index) => button('',() => openMemoryCard(index),'memory-card')));
+  $('memory-easy').setAttribute('aria-pressed',pairs === 3);
+  $('memory-hard').setAttribute('aria-pressed',pairs === 6);
+  $('memory-status').textContent = '';
+  refreshMemory();
+}
+function showPuzzleMode(memory) {
+  $('picture-puzzle').hidden = memory;
+  $('memory-puzzle').hidden = !memory;
+  $('picture-mode').setAttribute('aria-pressed',!memory);
+  $('memory-mode').setAttribute('aria-pressed',memory);
+}
+$('picture-mode').addEventListener('click',() => showPuzzleMode(false));
+$('memory-mode').addEventListener('click',() => showPuzzleMode(true));
+$('memory-easy').addEventListener('click',() => startMemory(3));
+$('memory-hard').addEventListener('click',() => startMemory(6));
+$('memory-restart').addEventListener('click',() => startMemory(memoryPairs));
+startMemory(3);
 
 const TIME_ZONE = 'Asia/Seoul';
 const dateFormat = new Intl.DateTimeFormat('sv-SE',{timeZone:TIME_ZONE,year:'numeric',month:'2-digit',day:'2-digit'});
