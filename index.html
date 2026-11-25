@@ -1403,11 +1403,10 @@ async function saveArtImage(board,filename,status) {
     output.width = 800;
     output.height = 600;
     output.getContext('2d').drawImage(image,0,0,800,600);
-    const link = document.createElement('a');
+    const link = element('a','PNG 내려받기','button');
     link.href = output.toDataURL('image/png');
     link.download = filename + '.png';
-    link.click();
-    status.textContent = '그림을 저장했어요.';
+    status.replaceChildren(link);
   } catch {
     status.textContent = '그림을 저장하지 못했어요.';
   } finally {
