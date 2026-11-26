@@ -94,6 +94,24 @@ p { line-height:1.65; }
 .voice-card .feedback { margin:5px 0 13px; }
 .voice-card .button { min-height:44px; }
 .voice-settings-note { margin:13px 0 0; }
+.voice-playroom { max-width:860px; margin-inline:auto; }
+.voice-recorder { text-align:center; background:#f2e9ff; border-color:#e0d2f2; }
+.voice-recorder h2 { margin-bottom:5px; }
+.voice-recorder .button { min-height:52px; min-width:145px; font-size:1.08rem; }
+.voice-recorder .feedback { margin-bottom:0; }
+.voice-collection { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; padding:0; list-style:none; }
+.voice-collection-item { min-width:0; padding:11px; border:1px solid #ded5ec; border-radius:16px; background:#faf5ff; }
+.voice-collection-item:nth-child(3n+2) { background:#eff9f3; border-color:#d3e9dd; }
+.voice-collection-item:nth-child(3n+3) { background:#fff8e8; border-color:#f3e4be; }
+.voice-collection-play { display:flex; gap:10px; align-items:center; width:100%; min-height:72px; padding:10px; border:1px solid #c7b9dc; border-radius:12px; background:white; text-align:left; }
+.voice-collection-play:hover { border-color:#9e7fd0; }
+.voice-play-icon { display:grid; flex:0 0 36px; height:36px; place-items:center; background:#eee3fa; color:#493284; border-radius:50%; }
+.voice-transcript { min-width:0; font-size:1.14rem; font-weight:850; overflow-wrap:anywhere; white-space:pre-wrap; }
+.voice-card-actions { margin-top:8px; }
+.voice-card-message { margin:7px 0 0; }
+.voice-card-edit { margin-top:8px; }
+.voice-card-edit input { width:100%; }
+.voice-card-edit .row { margin-top:6px; }
 .quiz-prompt { font-size:1.35rem; margin:22px 0 5px; }
 .quiz-picture { display:grid; place-items:center; margin:0 auto 13px; min-height:119px; width:min(100%,250px); border-radius:19px; background:#fcf7eb; font-size:4rem; }
 .options { display:grid; grid-template-columns:repeat(var(--option-count,3),minmax(0,1fr)); gap:10px; max-width:570px; margin:18px auto 4px; }
@@ -251,6 +269,7 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
   .ebs-list { grid-template-columns:1fr; }
   .ebs-list article p { min-height:0; }
   .voice-settings-grid { grid-template-columns:1fr; }
+  .voice-collection { grid-template-columns:1fr; }
   .animal-picker { grid-template-columns:repeat(var(--animal-count,4),minmax(0,1fr)); }
   .game-toolbar { justify-content:center; }
   .puzzle-content { grid-template-columns:1fr; gap:8px; }
@@ -275,6 +294,7 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
   </div>
   <div class="cards">
     <a class="jump" href="#hangul"><span class="jump-icon" aria-hidden="true">ㄱ</span><h3>한글놀이</h3><p class="small">그림을 보고 낱말 카드를 찾아요.</p></a>
+    <a class="jump" href="#voice-cards"><span class="jump-icon" aria-hidden="true">🎙️</span><h3>내 목소리 카드</h3><p class="small">말할 때마다 듣고 놀 수 있는 카드가 생겨요.</p></a>
     <a class="jump" href="#numbers"><span class="jump-icon" aria-hidden="true">123</span><h3>숫자놀이</h3><p class="small">그림을 세고 빠진 숫자를 찾아요.</p></a>
     <a class="jump" href="#english"><span class="jump-icon" aria-hidden="true">ABC</span><h3>영어놀이</h3><p class="small">알파벳과 그림 단어를 맞혀요.</p></a>
     <a class="jump" href="#thinking"><span class="jump-icon" aria-hidden="true">◆ ○</span><h3>생각놀이</h3><p class="small">그림의 규칙을 찾고 이야기 순서를 맞춰요.</p></a>
@@ -318,6 +338,27 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
     </div>
     <p id="voice-status" class="small feedback" role="status" data-record-status>한 번에 최대 6초까지 녹음해요.</p>
   </details>
+</section>
+<section id="voice-cards" hidden>
+  <h1 class="page-title" tabindex="-1">내 목소리 카드</h1>
+  <nav class="learn-nav" aria-label="배움놀이"></nav>
+  <div class="voice-playroom">
+    <div class="panel voice-recorder" id="voice-collection-recorder" data-recording-panel>
+      <h2>말하면 카드가 생겨요!</h2>
+      <p>마이크 버튼을 누르고 말해요. 만든 카드를 눌러 내 목소리를 들어요.</p>
+      <button class="button primary" type="button" data-record-start>🎙️ 녹음 시작</button>
+      <p class="feedback small" role="status" data-record-status>한 번에 최대 15초까지 녹음해요.</p>
+    </div>
+    <section class="panel" aria-labelledby="my-voice-cards-title">
+      <div class="section-head">
+        <h2 id="my-voice-cards-title">내가 만든 카드</h2>
+        <p id="my-voice-card-count" class="small" role="status"></p>
+      </div>
+      <ul id="my-voice-cards" class="voice-collection" aria-label="녹음 카드"></ul>
+      <p id="my-voice-cards-empty" class="empty">아직 카드가 없어요. 첫 카드를 만들어 봐요!</p>
+      <p class="small">음성과 글자는 이 브라우저에 저장돼요. 처음 글자로 바꿀 때는 음성 인식 모델을 내려받아요.</p>
+    </section>
+  </div>
 </section>
 <section id="numbers" hidden>
   <h1 class="page-title" tabindex="-1">숫자놀이</h1>
@@ -580,7 +621,7 @@ const ENGLISH_WORDS = [
   ['sun','☀️','해'],['turtle','🐢','거북이'],['umbrella','☂️','우산'],['water','💧','물'],
   ...EXTRA_WORDS.filter(([,english]) => english).map(([korean,english,picture]) => [english,picture,korean])
 ];
-const LEARNING_PAGES = {hangul:'한글놀이',numbers:'숫자놀이',english:'영어놀이',thinking:'생각놀이',ebs:'EBS 영상'};
+const LEARNING_PAGES = {hangul:'한글놀이','voice-cards':'내 목소리 카드',numbers:'숫자놀이',english:'영어놀이',thinking:'생각놀이',ebs:'EBS 영상'};
 const ART_ROUTES = {art:'trace-mode',paint:'free-mode',coloring:'coloring-mode',stickers:'sticker-art-mode'};
 const STARTER_PLACES = [
   {title:'국립과천과학관',area:'과천',type:'실내',cost:'상설전시 7세 미만 무료',note:'전시를 보며 좋아하는 공룡이나 우주 이야기를 골라보세요.',url:'https://smart.sciencecenter.go.kr/gcsci/info/info_fee.php'},
@@ -1062,7 +1103,8 @@ function openVoiceDatabase() {
 async function voiceData(action, word, blob) {
   const db = await openVoiceDatabase();
   return new Promise((resolve,reject) => {
-    const tx = db.transaction('recordings', action === 'get' ? 'readonly' : 'readwrite');
+    const readOnly = action === 'get' || action === 'getAll';
+    const tx = db.transaction('recordings', readOnly ? 'readonly' : 'readwrite');
     const recordings = tx.objectStore('recordings');
     const request = action === 'put' ? recordings.put(blob,word) : recordings[action](word);
     tx.oncomplete = () => resolve(request.result);
@@ -1086,14 +1128,15 @@ WORDS.forEach(([word]) => $('voice-word').add(new Option(word,word)));
 const recordingSettings = Array.from(document.querySelectorAll('[data-recording-panel]'), (panel) => {
   const kind = panel.dataset.feedbackVoice;
   const word = panel.querySelector('select');
+  const collection = panel.id === 'voice-collection-recorder';
   return {
-    kind, word, section:panel.closest('section'),
+    kind, word, collection, section:panel.closest('section'),
     start:panel.querySelector('[data-record-start]'),
     play:panel.querySelector('[data-record-play]'),
     remove:panel.querySelector('[data-record-delete]'),
     status:panel.querySelector('[data-record-status]'),
-    key:() => kind ? 'feedback:' + kind : word.value,
-    label:() => kind ? FEEDBACK_VOICE[kind] : word.value,
+    key:() => kind ? 'feedback:' + kind : word?.value,
+    label:() => kind ? FEEDBACK_VOICE[kind] : word?.value,
     deleting:false
   };
 });
@@ -1103,10 +1146,11 @@ function updateRecordingControls() {
     const locked = Boolean(activeRecording) || setting.deleting;
     const noClip = setting.kind && !feedbackClips.get(setting.kind);
     const startLabel = recording ? '녹음 끝내기' : '녹음 시작';
-    setting.start.textContent = startLabel;
+    setting.start.textContent = setting.collection && !recording ? '🎙️ ' + startLabel : startLabel;
     if (setting.kind) setting.start.setAttribute('aria-label',setting.label() + ' ' + startLabel);
     setting.start.disabled = locked && !recording;
-    setting.play.disabled = setting.remove.disabled = Boolean(locked || noClip);
+    if (setting.play) setting.play.disabled = Boolean(locked || noClip);
+    if (setting.remove) setting.remove.disabled = Boolean(locked || noClip);
     if (setting.word) setting.word.disabled = locked;
   }
 }
@@ -1169,17 +1213,22 @@ async function recordVoice(setting) {
       try {
         if (!pieces.length) throw new Error('Empty recording');
         const clip = new Blob(pieces,{type:pieces[0].type || media.mimeType});
-        await voiceData('put',key,clip);
-        if (setting.kind) feedbackClips.set(setting.kind,clip);
-        setting.status.textContent = '‘' + label + '’ 녹음을 저장했어요.';
+        if (setting.collection) {
+          await saveVoiceCollectionCard(clip);
+          setting.status.textContent = '새 녹음 카드가 생겼어요!';
+        } else {
+          await voiceData('put',key,clip);
+          if (setting.kind) feedbackClips.set(setting.kind,clip);
+          setting.status.textContent = '‘' + label + '’ 녹음을 저장했어요.';
+        }
       } catch {
         setting.status.textContent = '녹음을 저장하지 못했어요. 다시 시도해 주세요.';
       } finally { finishRecording(job); }
     };
     media.start();
     updateRecordingControls();
-    setting.status.textContent = '녹음 중이에요. ‘' + label + '’라고 말해 보세요.';
-    job.timeout = setTimeout(() => stopRecording(job),6000);
+    setting.status.textContent = setting.collection ? '녹음 중이에요. 하고 싶은 말을 해요!' : '녹음 중이에요. ‘' + label + '’라고 말해 보세요.';
+    job.timeout = setTimeout(() => stopRecording(job),setting.collection ? 15000 : 6000);
   } catch {
     if (activeRecording !== job) return;
     finishRecording(job);
@@ -1218,8 +1267,8 @@ async function deleteVoice(setting) {
 }
 for (const setting of recordingSettings) {
   setting.start.addEventListener('click', () => recordVoice(setting));
-  setting.play.addEventListener('click', () => previewVoice(setting));
-  setting.remove.addEventListener('click', () => deleteVoice(setting));
+  setting.play?.addEventListener('click', () => previewVoice(setting));
+  setting.remove?.addEventListener('click', () => deleteVoice(setting));
   if (setting.kind) {
     voiceData('get',setting.key()).then((clip) => {
       if (feedbackClips.has(setting.kind)) return;
@@ -1235,6 +1284,177 @@ window.addEventListener('hashchange', () => {
   if (activeRecording?.setting.section.hidden) cancelRecording();
 });
 window.addEventListener('pagehide', cancelRecording);
+
+const VOICE_COLLECTION_PREFIX = 'voice-collection:';
+let voiceCollectionLoad;
+let voiceTranscriptionWorker;
+let voiceTranscriptionQueue = Promise.resolve();
+function updateVoiceCollectionCount() {
+  const count = $('my-voice-cards').children.length;
+  $('my-voice-card-count').textContent = count + '장';
+  $('my-voice-cards-empty').hidden = count > 0;
+}
+async function saveVoiceCollectionCard(clip) {
+  const key = VOICE_COLLECTION_PREFIX + crypto.randomUUID();
+  const card = {key, clip, transcript:null, createdAt:Date.now()};
+  await voiceData('put',key,card);
+  renderVoiceCollectionCard(card,true);
+}
+async function saveVoiceTranscript(key, transcript, onlyIfEmpty) {
+  const db = await openVoiceDatabase();
+  return new Promise((resolve,reject) => {
+    const tx = db.transaction('recordings','readwrite');
+    const store = tx.objectStore('recordings');
+    const request = store.get(key);
+    let changed = false;
+    request.onsuccess = () => {
+      const current = request.result;
+      if (!current || (onlyIfEmpty && current.transcript !== null)) return;
+      store.put({...current,transcript},key);
+      changed = true;
+    };
+    tx.oncomplete = () => resolve(changed);
+    tx.onabort = () => reject(tx.error);
+  });
+}
+async function recogniseVoiceClip(clip) {
+  const context = new OfflineAudioContext(1,1,16000);
+  const decoded = await context.decodeAudioData(await clip.arrayBuffer());
+  const samples = new Float32Array(decoded.length);
+  for (let channel = 0; channel < decoded.numberOfChannels; channel++) {
+    const source = decoded.getChannelData(channel);
+    for (let i = 0; i < samples.length; i++) samples[i] += source[i] / decoded.numberOfChannels;
+  }
+  return new Promise((resolve,reject) => {
+    const worker = voiceTranscriptionWorker ||= new Worker('./voice-transcription.js',{type:'module'});
+    const fail = () => {
+      clearTimeout(timeout);
+      worker.terminate();
+      voiceTranscriptionWorker = undefined;
+      reject(new Error('Speech recognition did not complete'));
+    };
+    const timeout = setTimeout(fail,180000);
+    worker.onmessage = ({data}) => {
+      clearTimeout(timeout);
+      if (typeof data?.text === 'string') resolve(data.text);
+      else fail();
+    };
+    worker.onerror = fail;
+    try { worker.postMessage(samples,[samples.buffer]); } catch { fail(); }
+  });
+}
+function renderVoiceCollectionCard(card, fresh = false) {
+  const row = element('li','','voice-collection-item');
+  const play = button('',async () => {
+    if (activeRecording) return;
+    stopAudio();
+    const action = pendingAudioAction;
+    try { await playBlob(card.clip); }
+    catch { if (action === pendingAudioAction) message.textContent = '녹음을 재생하지 못했어요.'; }
+  },'voice-collection-play');
+  const symbol = element('span','▶','voice-play-icon');
+  symbol.setAttribute('aria-hidden','true');
+  const title = element('span','','voice-transcript');
+  play.append(symbol,title);
+
+  const message = element('p','','small voice-card-message');
+  message.setAttribute('role','status');
+  function showTranscript() {
+    title.textContent = card.transcript || '내 녹음';
+    play.setAttribute('aria-label',title.textContent + ' 재생');
+  }
+  async function transcribeCard() {
+    message.textContent = '말을 글자로 바꾸고 있어요.';
+    retry.hidden = true;
+    voiceTranscriptionQueue = voiceTranscriptionQueue.then(async () => {
+      if (!row.isConnected || card.transcript !== null) return;
+      try {
+        const transcript = (await recogniseVoiceClip(card.clip)).trim();
+        if (!row.isConnected || card.transcript !== null) return;
+        if (!transcript) throw new Error('No speech recognised');
+        if (await saveVoiceTranscript(card.key,transcript,true) && card.transcript === null) {
+          card.transcript = transcript;
+          showTranscript();
+        }
+        message.textContent = '';
+      } catch {
+        if (!row.isConnected || card.transcript !== null) return;
+        message.textContent = '말을 글자로 바꾸지 못했어요. 다시 시도하거나 글자를 적어 주세요.';
+        retry.hidden = false;
+      }
+    });
+  }
+  const editForm = element('form','','voice-card-edit');
+  editForm.hidden = true;
+  const label = element('label','카드에 보일 글자','field');
+  const input = element('input');
+  input.required = true;
+  label.append(input);
+  const editActions = element('div','','row');
+  const save = element('button','글자 저장','button primary');
+  save.type = 'submit';
+  editActions.append(save,button('취소',() => { editForm.hidden = true; edit.focus(); }));
+  editForm.append(label,editActions);
+  const edit = button('글자 수정',() => {
+    input.value = card.transcript || '';
+    editForm.hidden = false;
+    input.focus();
+  });
+  editForm.addEventListener('submit',async (event) => {
+    event.preventDefault();
+    const transcript = input.value.trim();
+    if (!transcript) return;
+    save.disabled = true;
+    try {
+      if (!await saveVoiceTranscript(card.key,transcript,false)) throw new Error('Card not found');
+      card.transcript = transcript;
+      showTranscript();
+      retry.hidden = true;
+      editForm.hidden = true;
+      edit.focus();
+      message.textContent = '카드 글자를 저장했어요.';
+    } catch { message.textContent = '글자를 저장하지 못했어요.'; }
+    finally { save.disabled = false; }
+  });
+  const retry = button('말을 글자로 바꾸기',transcribeCard);
+  retry.hidden = card.transcript !== null;
+  const remove = button('삭제',async () => {
+    if (!window.confirm('이 녹음 카드를 삭제할까요?')) return;
+    stopAudio();
+    remove.disabled = true;
+    try {
+      await voiceData('delete',card.key);
+      row.remove();
+      updateVoiceCollectionCount();
+    } catch {
+      message.textContent = '카드를 삭제하지 못했어요.';
+      remove.disabled = false;
+    }
+  });
+  const actions = element('div','','row voice-card-actions');
+  actions.append(edit,retry,remove);
+  showTranscript();
+  row.append(play,actions,editForm,message);
+  const collection = $('my-voice-cards');
+  if (fresh) {
+    collection.prepend(row);
+    transcribeCard();
+  } else collection.append(row);
+  updateVoiceCollectionCount();
+}
+function openVoiceCollection() {
+  if (location.hash !== '#voice-cards' || voiceCollectionLoad) return;
+  const range = IDBKeyRange.bound(VOICE_COLLECTION_PREFIX,VOICE_COLLECTION_PREFIX + '\uffff');
+  voiceCollectionLoad = voiceData('getAll',range).then((cards) => {
+    cards.sort((left,right) => right.createdAt - left.createdAt).forEach((card) => renderVoiceCollectionCard(card));
+    updateVoiceCollectionCount();
+  }).catch(() => {
+    $('my-voice-cards-empty').textContent = '녹음 카드를 불러오지 못했어요. 브라우저 저장 공간을 확인해 주세요.';
+    voiceCollectionLoad = undefined;
+  });
+}
+window.addEventListener('hashchange',openVoiceCollection);
+openVoiceCollection();
 
 const stickerKey = 'family-playroom-reward-photo';
 function readSticker() {
