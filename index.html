@@ -85,6 +85,15 @@ p { line-height:1.65; }
 .player-settings { margin-top:13px; padding:13px 16px; }
 .player-settings form { margin-top:10px; align-items:flex-end; }
 .player-settings .field input { width:min(240px,100%); }
+.voice-settings { max-width:880px; margin-inline:auto; }
+.voice-settings .section-head { align-items:center; }
+.voice-settings .page-title { margin-bottom:4px; }
+.voice-settings-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.voice-card { margin-top:0; background:#f4fbf7; border-color:#cfe7d9; }
+.voice-card[data-feedback-voice="incorrect"] { background:#fff8ee; border-color:#eddcc7; }
+.voice-card .feedback { margin:5px 0 13px; }
+.voice-card .button { min-height:44px; }
+.voice-settings-note { margin:13px 0 0; }
 .quiz-prompt { font-size:1.35rem; margin:22px 0 5px; }
 .quiz-picture { display:grid; place-items:center; margin:0 auto 13px; min-height:119px; width:min(100%,250px); border-radius:19px; background:#fcf7eb; font-size:4rem; }
 .options { display:grid; grid-template-columns:repeat(var(--option-count,3),minmax(0,1fr)); gap:10px; max-width:570px; margin:18px auto 4px; }
@@ -241,6 +250,7 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
   .routine-groups { grid-template-columns:1fr; }
   .ebs-list { grid-template-columns:1fr; }
   .ebs-list article p { min-height:0; }
+  .voice-settings-grid { grid-template-columns:1fr; }
   .animal-picker { grid-template-columns:repeat(var(--animal-count,4),minmax(0,1fr)); }
   .game-toolbar { justify-content:center; }
   .puzzle-content { grid-template-columns:1fr; gap:8px; }
@@ -254,7 +264,7 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
 <header><div class="bar">
   <a class="brand" href="#home"><span class="logo" aria-hidden="true">✿</span> 우리집 놀이터</a>
   <nav aria-label="주 메뉴" id="main-menu">
-    <a href="#hangul">배움놀이</a><a href="#art">미술놀이</a><a href="#puzzle">퍼즐</a><a href="#family">가족 대시보드</a><a href="#routine">오늘 할 일</a>
+    <a href="#hangul">배움놀이</a><a href="#art">미술놀이</a><a href="#puzzle">퍼즐</a><a href="#family">가족 대시보드</a><a href="#routine">오늘 할 일</a><a href="#voice-settings">부모 설정</a>
   </nav>
 </div></header>
 <main>
@@ -297,16 +307,16 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
     <button class="button primary" type="button" id="next">다음 카드</button>
   </div>
   </div>
-  <details class="panel">
+  <details class="panel" data-recording-panel>
     <summary>부모 메뉴 · 우리 목소리 카드</summary>
     <p class="small">낱말 하나를 골라 아이가 직접 말하는 소리를 담아보세요. 녹음은 이 브라우저에 저장돼요.</p>
     <div class="row">
       <label class="field">낱말 <select id="voice-word"></select></label>
-      <button class="button primary" type="button" id="record">녹음 시작</button>
-      <button class="button" type="button" id="play-recording">녹음 듣기</button>
-      <button class="button" type="button" id="delete-recording">녹음 지우기</button>
+      <button class="button primary" type="button" id="record" data-record-start>녹음 시작</button>
+      <button class="button" type="button" id="play-recording" data-record-play>녹음 듣기</button>
+      <button class="button" type="button" id="delete-recording" data-record-delete>녹음 지우기</button>
     </div>
-    <p id="voice-status" class="small feedback" role="status">한 번에 최대 6초까지 녹음해요.</p>
+    <p id="voice-status" class="small feedback" role="status" data-record-status>한 번에 최대 6초까지 녹음해요.</p>
   </details>
 </section>
 <section id="numbers" hidden>
@@ -488,6 +498,33 @@ footer { padding:0 0 24px; color:#535e71; font-size:.9rem; }
     <p id="sticker-status" class="small feedback" role="status"></p>
   </details>
 </section>
+<section id="voice-settings" class="voice-settings" hidden>
+  <div class="section-head">
+    <div><h1 class="page-title" tabindex="-1">놀이 목소리 설정</h1><p class="small">배움놀이와 퍼즐에 나올 정답·오답 목소리를 담아요.</p></div>
+    <a class="button" href="#hangul">한글놀이에서 해보기</a>
+  </div>
+  <div class="voice-settings-grid">
+    <article class="panel voice-card" data-recording-panel data-feedback-voice="correct" aria-labelledby="correct-voice-title">
+      <h2 id="correct-voice-title">맞았어요!</h2>
+      <p class="small feedback" role="status" data-record-status>녹음을 확인하고 있어요.</p>
+      <div class="row">
+        <button class="button primary" type="button" data-record-start aria-label="맞았어요! 녹음 시작">녹음 시작</button>
+        <button class="button" type="button" data-record-play aria-label="맞았어요! 미리 듣기" disabled>미리 듣기</button>
+        <button class="button" type="button" data-record-delete aria-label="맞았어요! 녹음 삭제" disabled>삭제</button>
+      </div>
+    </article>
+    <article class="panel voice-card" data-recording-panel data-feedback-voice="incorrect" aria-labelledby="incorrect-voice-title">
+      <h2 id="incorrect-voice-title">틀렸어요!</h2>
+      <p class="small feedback" role="status" data-record-status>녹음을 확인하고 있어요.</p>
+      <div class="row">
+        <button class="button primary" type="button" data-record-start aria-label="틀렸어요! 녹음 시작">녹음 시작</button>
+        <button class="button" type="button" data-record-play aria-label="틀렸어요! 미리 듣기" disabled>미리 듣기</button>
+        <button class="button" type="button" data-record-delete aria-label="틀렸어요! 녹음 삭제" disabled>삭제</button>
+      </div>
+    </article>
+  </div>
+  <p class="small voice-settings-note">녹음은 최대 6초이고 이 브라우저에 저장돼요. 녹음이 없으면 기기의 한국어 음성을 사용해요.</p>
+</section>
 </main>
 <footer>가족 기록, 사진과 녹음은 이 브라우저에서만 볼 수 있어요.</footer>
 <script>
@@ -563,7 +600,7 @@ function button(label, onClick, className = 'button') {
 }
 function showPage(focus) {
   const requested = location.hash.slice(1);
-  const sections = ['home','art','puzzle','family','routine',...Object.keys(LEARNING_PAGES)];
+  const sections = ['home','art','puzzle','family','routine','voice-settings',...Object.keys(LEARNING_PAGES)];
   const linkedSections = {memory:'puzzle',outings:'family'};
   const section = Object.hasOwn(linkedSections,requested) ? linkedSections[requested]
     : Object.hasOwn(ART_ROUTES,requested) ? 'art' : sections.includes(requested) ? requested : 'home';
@@ -587,6 +624,9 @@ function shuffled(list) {
 }
 let pendingAudioAction = 0;
 let activeAudio;
+let activeRecording;
+const FEEDBACK_VOICE = {correct:'맞았어요!',incorrect:'틀렸어요!'};
+const feedbackClips = new Map();
 function speakLocal(text,lang = 'ko-KR') {
   if (!window.speechSynthesis) return false;
   const speech = window.speechSynthesis;
@@ -607,6 +647,7 @@ function stopAudio() {
   window.speechSynthesis?.cancel();
 }
 async function listen(text, useRecording, status, lang = 'ko-KR') {
+  if (activeRecording) return;
   stopAudio();
   const action = pendingAudioAction;
   if (useRecording) {
@@ -621,6 +662,16 @@ async function listen(text, useRecording, status, lang = 'ko-KR') {
   if (!speakLocal(text,lang)) status.textContent = lang === 'ko-KR'
     ? '이 기기에서 한국어 음성을 찾지 못했어요.'
     : '이 기기에서 영어 음성을 찾지 못했어요.';
+}
+function playAnswerFeedback(result) {
+  if (activeRecording) return;
+  stopAudio();
+  const action = pendingAudioAction;
+  const clip = feedbackClips.get(result);
+  if (!clip) { speakLocal(FEEDBACK_VOICE[result]); return; }
+  playBlob(clip).catch(() => {
+    if (action === pendingAudioAction) speakLocal(FEEDBACK_VOICE[result]);
+  });
 }
 
 const NUMBER_ICONS = [['🍎','사과'],['⭐','별'],['🐥','병아리'],['🌷','꽃'],['🍓','딸기'],['🍐','배'],['🐠','물고기'],['🎈','풍선']];
@@ -894,10 +945,12 @@ function chooseGameOption(label,choice) {
   if (label !== expected) {
     choice.classList.add('retry');
     feedback.textContent = '한 번 더 골라볼까요?';
+    playAnswerFeedback('incorrect');
     return;
   }
   choice.classList.remove('retry');
   choice.classList.add('good');
+  playAnswerFeedback('correct');
   if (story) {
     choice.disabled = true;
     storyStep++;
@@ -1030,86 +1083,158 @@ async function playBlob(blob) {
   try { await audio.play(); } catch (err) { release(); throw err; }
 }
 WORDS.forEach(([word]) => $('voice-word').add(new Option(word,word)));
-let recorder;
-let timeout;
-let voiceBusy = false;
-const voiceStatus = $('voice-status');
-$('record').addEventListener('click', async () => {
-  if (recorder?.state === 'recording') { recorder.stop(); return; }
-  if (voiceBusy) return;
+const recordingSettings = Array.from(document.querySelectorAll('[data-recording-panel]'), (panel) => {
+  const kind = panel.dataset.feedbackVoice;
+  const word = panel.querySelector('select');
+  return {
+    kind, word, section:panel.closest('section'),
+    start:panel.querySelector('[data-record-start]'),
+    play:panel.querySelector('[data-record-play]'),
+    remove:panel.querySelector('[data-record-delete]'),
+    status:panel.querySelector('[data-record-status]'),
+    key:() => kind ? 'feedback:' + kind : word.value,
+    label:() => kind ? FEEDBACK_VOICE[kind] : word.value,
+    deleting:false
+  };
+});
+function updateRecordingControls() {
+  for (const setting of recordingSettings) {
+    const recording = activeRecording?.setting === setting && activeRecording.media?.state === 'recording';
+    const locked = Boolean(activeRecording) || setting.deleting;
+    const noClip = setting.kind && !feedbackClips.get(setting.kind);
+    const startLabel = recording ? '녹음 끝내기' : '녹음 시작';
+    setting.start.textContent = startLabel;
+    if (setting.kind) setting.start.setAttribute('aria-label',setting.label() + ' ' + startLabel);
+    setting.start.disabled = locked && !recording;
+    setting.play.disabled = setting.remove.disabled = Boolean(locked || noClip);
+    if (setting.word) setting.word.disabled = locked;
+  }
+}
+function closeRecordingStream(job) {
+  clearTimeout(job.timeout);
+  job.stream?.getTracks().forEach((track) => track.stop());
+  job.stream = undefined;
+}
+function finishRecording(job) {
+  closeRecordingStream(job);
+  if (activeRecording === job) {
+    activeRecording = undefined;
+    updateRecordingControls();
+  }
+}
+function stopRecording(job) {
+  if (job.media?.state !== 'recording') return;
+  job.setting.start.disabled = true;
+  job.media.stop();
+}
+function cancelRecording() {
+  const job = activeRecording;
+  if (!job || job.saving) return;
+  stopRecording(job);
+  finishRecording(job);
+  job.setting.status.textContent = '화면을 이동해 녹음을 취소했어요.';
+}
+async function recordVoice(setting) {
+  if (activeRecording?.setting === setting) { stopRecording(activeRecording); return; }
+  if (activeRecording || setting.deleting) return;
   if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
-    voiceStatus.textContent = '녹음은 HTTPS 페이지와 마이크를 지원하는 브라우저에서 이용할 수 있어요.';
+    setting.status.textContent = '녹음은 HTTPS 페이지와 마이크를 지원하는 브라우저에서 이용할 수 있어요.';
     return;
   }
   stopAudio();
-  const word = $('voice-word').value;
-  let stream;
-  voiceBusy = true;
-  $('record').disabled = true;
-  $('voice-word').disabled = true;
-  $('play-recording').disabled = true;
-  $('delete-recording').disabled = true;
-  function finish() {
-    clearTimeout(timeout);
-    stream?.getTracks().forEach((track) => track.stop());
-    voiceBusy = false;
-    recorder = undefined;
-    $('record').textContent = '녹음 시작';
-    $('record').disabled = false;
-    $('voice-word').disabled = false;
-    $('play-recording').disabled = false;
-    $('delete-recording').disabled = false;
-  }
+  const key = setting.key();
+  const label = setting.label();
+  const job = {setting};
+  activeRecording = job;
+  updateRecordingControls();
+  setting.status.textContent = '마이크를 준비하고 있어요.';
   try {
-    stream = await navigator.mediaDevices.getUserMedia({audio:true});
-    recorder = new MediaRecorder(stream);
+    job.stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    if (activeRecording !== job) { finishRecording(job); return; }
+    const media = new MediaRecorder(job.stream);
+    job.media = media;
     const pieces = [];
-    let failed = false;
-    recorder.ondataavailable = (event) => { if (event.data.size) pieces.push(event.data); };
-    recorder.onerror = () => {
-      failed = true;
-      voiceStatus.textContent = '녹음이 중단됐어요. 다시 시도해 주세요.';
-      finish();
+    media.ondataavailable = (event) => { if (event.data.size) pieces.push(event.data); };
+    media.onerror = () => {
+      if (activeRecording !== job) return;
+      setting.status.textContent = '녹음이 중단됐어요. 다시 시도해 주세요.';
+      finishRecording(job);
     };
-    recorder.onstop = async () => {
-      if (failed) return;
-      clearTimeout(timeout);
-      stream.getTracks().forEach((track) => track.stop());
-      $('record').disabled = true;
+    media.onstop = async () => {
+      if (activeRecording !== job) return;
+      job.saving = true;
+      closeRecordingStream(job);
+      updateRecordingControls();
+      setting.status.textContent = '녹음을 저장하고 있어요.';
       try {
         if (!pieces.length) throw new Error('Empty recording');
-        await voiceData('put',word,new Blob(pieces,{type:pieces[0].type || recorder.mimeType}));
-        voiceStatus.textContent = '‘' + word + '’ 목소리를 저장했어요.';
-      } catch { voiceStatus.textContent = '녹음을 저장하지 못했어요. 브라우저 저장 공간을 확인해 주세요.'; }
-      finally { finish(); }
+        const clip = new Blob(pieces,{type:pieces[0].type || media.mimeType});
+        await voiceData('put',key,clip);
+        if (setting.kind) feedbackClips.set(setting.kind,clip);
+        setting.status.textContent = '‘' + label + '’ 녹음을 저장했어요.';
+      } catch {
+        setting.status.textContent = '녹음을 저장하지 못했어요. 다시 시도해 주세요.';
+      } finally { finishRecording(job); }
     };
-    recorder.start();
-    $('record').textContent = '녹음 끝내기';
-    $('record').disabled = false;
-    voiceStatus.textContent = '녹음 중이에요. ‘' + word + '’라고 말해 보세요.';
-    timeout = setTimeout(() => { if (recorder?.state === 'recording') recorder.stop(); },6000);
+    media.start();
+    updateRecordingControls();
+    setting.status.textContent = '녹음 중이에요. ‘' + label + '’라고 말해 보세요.';
+    job.timeout = setTimeout(() => stopRecording(job),6000);
   } catch {
-    finish();
-    voiceStatus.textContent = '마이크를 열 수 없어요. 브라우저의 마이크 사용 권한을 확인해 주세요.';
+    if (activeRecording !== job) return;
+    finishRecording(job);
+    setting.status.textContent = '마이크를 열 수 없어요. 브라우저의 마이크 사용 권한을 확인해 주세요.';
   }
-});
-$('play-recording').addEventListener('click', async () => {
+}
+async function previewVoice(setting) {
+  if (activeRecording || setting.deleting) return;
   stopAudio();
   const action = pendingAudioAction;
   try {
-    const saved = await voiceData('get',$('voice-word').value);
+    const saved = setting.kind ? feedbackClips.get(setting.kind) : await voiceData('get',setting.key());
     if (action !== pendingAudioAction) return;
-    if (saved) { await playBlob(saved); voiceStatus.textContent = '저장한 녹음을 재생해요.'; }
-    else voiceStatus.textContent = '이 낱말에 저장한 녹음이 없어요.';
-  } catch { voiceStatus.textContent = '녹음을 재생하지 못했어요.'; }
-});
-$('delete-recording').addEventListener('click', async () => {
+    if (!saved) { setting.status.textContent = '저장한 녹음이 없어요.'; return; }
+    await playBlob(saved);
+    if (action === pendingAudioAction) setting.status.textContent = '저장한 녹음을 재생해요.';
+  } catch {
+    if (action === pendingAudioAction) setting.status.textContent = '녹음을 재생하지 못했어요.';
+  }
+}
+async function deleteVoice(setting) {
+  if (activeRecording || setting.deleting) return;
   stopAudio();
+  setting.deleting = true;
+  updateRecordingControls();
   try {
-    await voiceData('delete',$('voice-word').value);
-    voiceStatus.textContent = '선택한 낱말의 녹음을 지웠어요.';
-  } catch { voiceStatus.textContent = '녹음을 지우지 못했어요.'; }
+    await voiceData('delete',setting.key());
+    if (setting.kind) feedbackClips.set(setting.kind,undefined);
+    setting.status.textContent = '녹음을 지웠어요.';
+  } catch {
+    setting.status.textContent = '녹음을 지우지 못했어요.';
+  } finally {
+    setting.deleting = false;
+    updateRecordingControls();
+  }
+}
+for (const setting of recordingSettings) {
+  setting.start.addEventListener('click', () => recordVoice(setting));
+  setting.play.addEventListener('click', () => previewVoice(setting));
+  setting.remove.addEventListener('click', () => deleteVoice(setting));
+  if (setting.kind) {
+    voiceData('get',setting.key()).then((clip) => {
+      if (feedbackClips.has(setting.kind)) return;
+      feedbackClips.set(setting.kind,clip);
+      if (activeRecording?.setting !== setting) setting.status.textContent = clip ? '녹음이 저장되어 있어요.' : '저장한 녹음이 없어요.';
+      updateRecordingControls();
+    }).catch(() => {
+      if (activeRecording?.setting !== setting) setting.status.textContent = '브라우저의 녹음 저장 공간을 열 수 없어요.';
+    });
+  }
+}
+window.addEventListener('hashchange', () => {
+  if (activeRecording?.setting.section.hidden) cancelRecording();
 });
+window.addEventListener('pagehide', cancelRecording);
 
 const stickerKey = 'family-playroom-reward-photo';
 function readSticker() {
@@ -1954,7 +2079,10 @@ function selectPicturePiece(position) {
     pictureSelection = undefined;
     pictureSolved = picturePieces.every((piece,index) => piece === index);
     $('picture-status').textContent = pictureSolved ? '그림을 맞췄어요! ⭐' : '다른 조각도 맞춰볼까요?';
-    if (pictureSolved) awardPlayerStar('puzzle');
+    if (pictureSolved) {
+      awardPlayerStar('puzzle');
+      playAnswerFeedback('correct');
+    }
   }
   refreshPicture();
 }
@@ -1973,6 +2101,7 @@ function refreshPicture() {
   });
 }
 function startPicture(size) {
+  stopAudio();
   pictureSize = size;
   const [columns,rows] = size;
   picturePieces = shuffled(Array.from({length:columns * rows},(_,index) => index));
@@ -2077,8 +2206,10 @@ function openMemoryCard(index) {
       const complete = memoryFound.size === memoryDeck.length;
       $('memory-status').textContent = complete ? '모든 짝을 찾았어요! ⭐' : '같은 카드를 찾았어요!';
       if (complete) awardPlayerStar('puzzle');
+      playAnswerFeedback('correct');
     } else {
       $('memory-status').textContent = '다른 카드가 나왔어요. 다시 골라봐요.';
+      playAnswerFeedback('incorrect');
       memoryTimer = setTimeout(() => { memoryOpen = []; refreshMemory(); },1000);
     }
   } else {
@@ -2087,6 +2218,7 @@ function openMemoryCard(index) {
   refreshMemory();
 }
 function startMemory(pairs) {
+  stopAudio();
   clearTimeout(memoryTimer);
   memoryPairs = pairs;
   const theme = MEMORY_THEMES[Number($('memory-theme').value)];
