@@ -77,7 +77,8 @@ p { line-height:1.65; }
 .jump:nth-child(7) .jump-icon { color:#553e9b; background:#ece0ff; }
 .jump:nth-child(8) .jump-icon { color:#72511b; background:#ffefc2; }
 .jump:nth-child(9) .jump-icon { color:#2c5f86; background:#dcecfa; }
-.jump:nth-child(10) .jump-icon { color:#553e9b; background:#ece0ff; }
+.jump:nth-child(10) .jump-icon { color:#a13b55; background:#ffdfe8; }
+.jump:nth-child(11) .jump-icon { color:#553e9b; background:#ece0ff; }
 .jump p { margin-bottom:0; }
 .panel { background:var(--surface); border:0; border-radius:34px; padding:28px; margin-top:20px; box-shadow:var(--clay-shadow); }
 .section-head { display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:14px; }
@@ -131,9 +132,15 @@ p { line-height:1.65; }
 .voice-collection-play { display:flex; gap:12px; align-items:center; width:100%; min-height:74px; padding:11px; border:0; border-radius:22px; background:var(--surface); text-align:left; box-shadow:var(--clay-shadow-sm); transition:transform .18s; }
 .voice-collection-play:hover { transform:translateY(-2px); }
 .voice-collection-play:active { box-shadow:var(--clay-pressed); transform:none; }
+.voice-collection-play.playing { background:#fff7fb; box-shadow:var(--clay-pressed); transform:none; }
+.voice-collection-play.playing .voice-play-icon { background:#ffdfe8; animation:rec-pulse .9s ease-in-out infinite; }
+.voice-collection-item.fresh { animation:trace-pop .6s both; }
 .voice-play-icon { display:grid; flex:0 0 40px; height:40px; place-items:center; background:var(--lavender); color:#493284; border-radius:50%; box-shadow:var(--clay-shadow-sm); }
 .voice-transcript { min-width:0; font-size:1.14rem; font-weight:850; overflow-wrap:anywhere; white-space:pre-wrap; }
-.voice-card-actions { margin-top:10px; }
+.voice-card-actions { margin-top:8px; justify-content:flex-end; gap:6px; }
+.voice-card-actions .button,.voice-card-tools .button { min-height:36px; padding:5px 13px; font-size:.88rem; }
+.voice-card-tools { margin-top:8px; justify-content:flex-end; gap:6px; }
+.button.danger { color:#a3243f; }
 .voice-card-message { margin:7px 0 0; }
 .voice-card-edit { margin-top:8px; }
 .voice-card-edit input { width:100%; }
@@ -279,6 +286,64 @@ canvas { display:block; width:100%; height:auto; background:#fff; border:0; bord
 .sticker-fields { align-items:flex-end; }
 .sticker-fields input[type="file"] { max-width:min(100%,260px); }
 .sticker-fields input[type="text"] { max-width:170px; }
+.voice-recorder [data-record-start] { min-height:76px; min-width:230px; font-size:1.3rem; }
+.button.is-recording,.button.primary.is-recording { color:white; background:linear-gradient(160deg,#ff7a8a,#d93d5c); box-shadow:0 12px 22px -9px #c0284a8c, inset -4px -6px 10px #9e1c3a66, inset 4px 5px 10px #ffffff59; animation:rec-pulse 1.3s ease-in-out infinite; }
+@keyframes rec-pulse { 50% { transform:scale(1.05); } }
+@keyframes rec-blink { 50% { opacity:.25; } }
+.rec-meter { display:flex; align-items:center; justify-content:center; gap:10px; width:fit-content; max-width:100%; margin:14px auto 0; padding:8px 16px; border-radius:999px; background:#fff0f3; box-shadow:var(--clay-pressed); }
+.voice-card .rec-meter,details[data-recording-panel] .rec-meter { margin-left:0; }
+.rec-dot { width:12px; height:12px; flex:0 0 12px; border-radius:50%; background:#d93d5c; animation:rec-blink 1s steps(2) infinite; }
+.rec-level { display:flex; align-items:center; gap:3px; height:26px; }
+.rec-level i { width:5px; height:100%; border-radius:4px; background:#d93d5c; transform:scaleY(calc(.18 + var(--level,0) * var(--k,.5))); transition:transform .08s; }
+.rec-level i:nth-child(1),.rec-level i:nth-child(5) { --k:.45; }
+.rec-level i:nth-child(2),.rec-level i:nth-child(4) { --k:.7; }
+.rec-level i:nth-child(3) { --k:.82; }
+.rec-progress { width:min(120px,26vw); height:10px; border-radius:9px; background:#ffd6de; overflow:hidden; box-shadow:inset 1px 2px 3px #c0284a33; }
+.rec-progress span { display:block; width:100%; height:100%; background:linear-gradient(90deg,#ff9aac,#d93d5c); transform-origin:left; transform:scaleX(var(--progress,0)); }
+.rec-time { min-width:3.4em; color:#a3243f; font-weight:850; font-variant-numeric:tabular-nums; }
+.page-pager { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:30px; }
+.page-pager a { display:flex; flex-direction:column; gap:2px; min-width:0; padding:14px 22px; border-radius:28px; background:var(--surface); color:var(--ink); text-decoration:none; box-shadow:var(--clay-shadow-sm); transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s; }
+.page-pager a:hover { transform:translateY(-3px); box-shadow:var(--clay-shadow); }
+.page-pager a:active { transform:none; box-shadow:var(--clay-pressed); }
+.page-pager span { color:var(--muted); font-size:.84rem; font-weight:800; }
+.page-pager strong { font-family:var(--round-font); font-size:1.25rem; font-weight:400; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.page-pager .next { grid-column:2; align-items:flex-end; text-align:right; background:linear-gradient(150deg,#fbf7ff,#efe5ff); }
+.create-panel { max-width:880px; margin-inline:auto; }
+.create-block { margin-top:24px; padding-top:18px; border-top:2px dotted #e4daf6; }
+.create-block h3 { margin-bottom:4px; }
+.music-actions { justify-content:center; }
+#music-status { text-align:center; }
+.xylophone { display:flex; align-items:center; justify-content:center; gap:clamp(5px,1.4vw,12px); height:clamp(200px,34vw,270px); margin:18px auto 14px; padding:14px clamp(10px,2vw,22px); border-radius:36px; background:linear-gradient(160deg,#fbf3e6,#f0dfc4); box-shadow:inset 5px 7px 14px #8a5a1633, inset -4px -5px 10px #ffffffcc; }
+.xylo-bar { flex:1 1 0; min-width:0; max-width:80px; height:var(--h); display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:12px 0; border:0; border-radius:22px; background:var(--bar); color:#2a2547; font-size:clamp(.82rem,2.4vw,1.1rem); font-weight:900; box-shadow:0 10px 16px -8px #2a254773, inset -5px -7px 12px #00000029, inset 5px 6px 10px #ffffffa6; touch-action:manipulation; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; transition:transform .1s; }
+.xylo-bar::before,.xylo-bar::after { content:""; width:12px; height:12px; border-radius:50%; background:#fffbf2; box-shadow:inset 1px 2px 3px #0000004d; }
+.xylo-bar.hit { animation:xylo-hit .28s ease-out; }
+.xylo-bar.next { box-shadow:0 0 0 4px #fff, 0 0 0 9px #7b5ce6, 0 14px 20px -8px #2a254773, inset -5px -7px 12px #00000029, inset 5px 6px 10px #ffffffa6; animation:xylo-hint 1s ease-in-out infinite; }
+@keyframes xylo-hit { 30% { transform:translateY(6px) scale(.96); filter:brightness(1.12); } }
+@keyframes xylo-hint { 50% { transform:translateY(-7px); } }
+.follow-progress { min-height:28px; margin:10px 0 0; color:#514178; font-weight:800; }
+.saved-songs { display:flex; flex-wrap:wrap; gap:10px; margin:10px 0 0; padding:0; list-style:none; }
+.saved-songs li { display:flex; align-items:center; gap:4px; padding:5px; border-radius:999px; background:var(--lavender); box-shadow:var(--clay-shadow-sm); }
+.saved-songs li:nth-child(3n+2) { background:var(--mint); } .saved-songs li:nth-child(3n+3) { background:var(--peach); }
+.saved-songs .button { min-height:40px; }
+.story-dice { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin:18px 0 6px; }
+.story-die { display:grid; place-items:center; align-content:center; gap:6px; min-width:0; min-height:178px; padding:14px 8px; border:0; border-radius:34px; background:var(--die); color:var(--ink); box-shadow:var(--clay-shadow); transition:transform .2s cubic-bezier(.34,1.56,.64,1); }
+.story-die:nth-child(1) { --die:#ffe5ec; } .story-die:nth-child(2) { --die:#e3f4e6; } .story-die:nth-child(3) { --die:#fff1d9; }
+.story-die:hover { transform:translateY(-4px) rotate(-1deg); }
+.story-die:active { transform:none; box-shadow:var(--clay-pressed); }
+.die-kind { padding:3px 11px; border-radius:999px; background:#ffffffb3; color:var(--muted); font-size:.84rem; font-weight:850; }
+.die-icon { font-size:clamp(2.6rem,9vw,4.2rem); line-height:1.1; }
+.die-word { font-family:var(--round-font); font-size:clamp(1rem,3vw,1.4rem); text-align:center; word-break:keep-all; }
+.story-die.rolling { animation:die-roll .6s ease-in-out; }
+@keyframes die-roll { 25% { transform:rotate(-8deg) scale(1.04); } 50% { transform:rotate(7deg) translateY(-8px); } 75% { transform:rotate(-4deg); } }
+.story-sentence { max-width:660px; min-height:1.45em; margin:16px auto 12px; padding:16px 20px; border-radius:28px; background:#fffaf0; text-align:center; font-family:var(--round-font); font-size:clamp(1.3rem,3.6vw,1.9rem); line-height:1.45; word-break:keep-all; box-shadow:var(--clay-pressed); }
+.story-actions { justify-content:center; }
+#story-status { text-align:center; }
+.story-strip { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:16px; margin:14px 0 0; padding:0; list-style:none; counter-reset:scene; }
+.story-strip li { position:relative; padding:18px 14px 14px; border-radius:26px; background:var(--peach); box-shadow:var(--clay-shadow-sm); counter-increment:scene; animation:trace-pop .5s both; }
+.story-strip li:nth-child(2) { background:var(--mint); } .story-strip li:nth-child(3) { background:var(--pink); } .story-strip li:nth-child(4) { background:var(--lavender); }
+.story-strip li::before { content:counter(scene); position:absolute; top:-8px; left:-6px; width:30px; height:30px; display:grid; place-items:center; border-radius:50%; background:#6a4bd6; color:white; font-weight:900; box-shadow:var(--clay-primary); }
+.scene-icons { margin-bottom:6px; text-align:center; font-size:2rem; letter-spacing:.08em; }
+.story-strip p { margin:0; font-weight:750; line-height:1.5; word-break:keep-all; }
 footer { padding:0 0 28px; color:#5a5574; font-size:.9rem; }
 @media (max-width:760px) {
   header { position:static; padding:10px 0 0; }
@@ -315,6 +380,16 @@ footer { padding:0 0 28px; color:#5a5574; font-size:.9rem; }
   .puzzle-content { grid-template-columns:1fr; gap:10px; }
   .puzzle-example { display:flex; align-items:center; gap:8px; }
   .puzzle-example img { order:-1; width:94px; margin:0; }
+  .page-pager { gap:10px; margin-top:22px; }
+  .page-pager a { padding:12px 14px; border-radius:22px; }
+  .page-pager strong { font-size:1.05rem; }
+  .xylophone { height:210px; gap:4px; padding:10px 8px; border-radius:28px; }
+  .xylo-bar { border-radius:14px; padding:9px 0; }
+  .xylo-bar::before,.xylo-bar::after { width:8px; height:8px; }
+  .story-dice { gap:8px; }
+  .story-die { min-height:136px; padding:10px 4px; border-radius:24px; }
+  .die-kind { font-size:.74rem; padding:2px 7px; }
+  .voice-recorder [data-record-start] { min-width:0; width:100%; }
 }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none !important; animation:none !important; } }
 </style>
@@ -323,7 +398,7 @@ footer { padding:0 0 28px; color:#5a5574; font-size:.9rem; }
 <header><div class="bar">
   <a class="brand" href="#home"><span class="logo" aria-hidden="true">✿</span> 우리집 놀이터</a>
   <nav aria-label="주 메뉴" id="main-menu">
-    <a href="#hangul">배움놀이</a><a href="#art">미술놀이</a><a href="#puzzle">퍼즐</a><a href="#family">가족 대시보드</a><a href="#routine">오늘 할 일</a><a href="#voice-settings">부모 설정</a>
+    <a href="#hangul">배움놀이</a><a href="#art">미술놀이</a><a href="#create">창작놀이</a><a href="#puzzle">퍼즐</a><a href="#family">가족 대시보드</a><a href="#routine">오늘 할 일</a><a href="#voice-settings">부모 설정</a>
   </nav>
 </div></header>
 <main>
@@ -339,6 +414,7 @@ footer { padding:0 0 28px; color:#5a5574; font-size:.9rem; }
     <a class="jump" href="#english"><span class="jump-icon" aria-hidden="true">ABC</span><h3>영어놀이</h3><p class="small">알파벳과 그림 단어를 맞혀요.</p></a>
     <a class="jump" href="#thinking"><span class="jump-icon" aria-hidden="true">◆ ○</span><h3>생각놀이</h3><p class="small">그림의 규칙을 찾고 이야기 순서를 맞춰요.</p></a>
     <a class="jump" href="#art"><span class="jump-icon" aria-hidden="true">✿</span><h3>미술놀이</h3><p class="small">그림을 그리고 색칠과 스티커로 꾸며요.</p></a>
+    <a class="jump" href="#create"><span class="jump-icon" aria-hidden="true">🎹</span><h3>창작놀이</h3><p class="small">실로폰으로 노래를 짓고 이야기 주사위를 굴려요.</p></a>
     <a class="jump" href="#puzzle"><span class="jump-icon" aria-hidden="true">▧</span><h3>퍼즐놀이</h3><p class="small">그림 퍼즐과 메모리 카드로 놀아요.</p></a>
     <a class="jump" href="#family"><span class="jump-icon" aria-hidden="true">▦</span><h3>가족 대시보드</h3><p class="small">우리 일정과 주말 나들이를 모아봐요.</p></a>
     <a class="jump" href="#routine"><span class="jump-icon" aria-hidden="true">★</span><h3>오늘 할 일</h3><p class="small">아침·저녁 할 일을 하고 스티커를 받아요.</p></a>
@@ -368,13 +444,13 @@ footer { padding:0 0 28px; color:#5a5574; font-size:.9rem; }
   </div>
   </div>
   <details class="panel" data-recording-panel>
-    <summary>부모 메뉴 · 우리 목소리 카드</summary>
-    <p class="small">낱말 하나를 골라 아이가 직접 말하는 소리를 담아보세요. 녹음은 이 브라우저에 저장돼요.</p>
+    <summary>부모 메뉴 · 이 낱말 내 목소리로 녹음</summary>
+    <p class="small">지금 보이는 낱말이 자동으로 골라져요. 아이가 말한 소리를 담으면 ‘소리 듣기’에서 그 목소리가 나와요. 🎙️ 표시는 이미 녹음한 낱말이에요.</p>
     <div class="row">
       <label class="field">낱말 <select id="voice-word"></select></label>
       <button class="button primary" type="button" id="record" data-record-start>녹음 시작</button>
-      <button class="button" type="button" id="play-recording" data-record-play>녹음 듣기</button>
-      <button class="button" type="button" id="delete-recording" data-record-delete>녹음 지우기</button>
+      <button class="button" type="button" id="play-recording" data-record-play disabled>녹음 듣기</button>
+      <button class="button" type="button" id="delete-recording" data-record-delete disabled>녹음 지우기</button>
     </div>
     <p id="voice-status" class="small feedback" role="status" data-record-status>한 번에 최대 6초까지 녹음해요.</p>
   </details>
@@ -387,7 +463,7 @@ footer { padding:0 0 28px; color:#5a5574; font-size:.9rem; }
       <h2>말하면 카드가 생겨요!</h2>
       <p>마이크 버튼을 누르고 말해요. 만든 카드를 눌러 내 목소리를 들어요.</p>
       <button class="button primary" type="button" data-record-start>🎙️ 녹음 시작</button>
-      <p class="feedback small" role="status" data-record-status>한 번에 최대 15초까지 녹음해요.</p>
+      <p class="feedback small" role="status" data-record-status>버튼을 누르고 말한 다음, 다시 누르면 끝나요. (최대 15초)</p>
     </div>
     <section class="panel" aria-labelledby="my-voice-cards-title">
       <div class="section-head">
@@ -489,6 +565,62 @@ footer { padding:0 0 28px; color:#5a5574; font-size:.9rem; }
       <button class="button primary" id="stamp-save" type="button">스티커 그림 저장</button>
     </div>
     <p id="stamp-status" class="feedback" role="status"></p>
+  </div>
+</section>
+<section id="create" hidden>
+  <div class="section-head">
+    <div><h1 class="page-title" tabindex="-1">창작놀이</h1><p class="small">정답 없이 마음대로 만들어요.</p></div>
+    <div class="row" aria-label="창작놀이 종류">
+      <button class="button" id="music-mode" type="button" aria-pressed="true">🎹 실로폰 작곡</button>
+      <button class="button" id="story-mode" type="button" aria-pressed="false">🎲 이야기 주사위</button>
+    </div>
+  </div>
+  <div class="panel create-panel" id="music-play">
+    <h2>무지개 실로폰</h2>
+    <p class="small">막대를 두드려 소리를 내요. ‘내 노래 녹음’을 누르고 치면 내가 만든 노래가 남아요.</p>
+    <div class="xylophone" id="xylophone" role="group" aria-label="실로폰"></div>
+    <div class="row music-actions">
+      <button class="button primary" id="song-record" type="button">⏺ 내 노래 녹음</button>
+      <button class="button" id="song-replay" type="button" disabled>▶ 다시 듣기</button>
+      <button class="button" id="song-save" type="button" disabled>💾 노래 저장</button>
+    </div>
+    <p class="feedback" id="music-status" role="status"></p>
+    <div class="create-block">
+      <h3>따라 치기</h3>
+      <p class="small">반짝이는 막대를 차례로 두드리면 노래가 완성돼요.</p>
+      <div class="row">
+        <label class="field" for="follow-song">노래 고르기</label><select id="follow-song"></select>
+        <button class="button" id="follow-listen" type="button">🔊 먼저 듣기</button>
+        <button class="button primary" id="follow-start" type="button">따라 치기 시작</button>
+      </div>
+      <p class="follow-progress" id="follow-progress" aria-live="polite"></p>
+    </div>
+    <div class="create-block">
+      <h3>내가 만든 노래</h3>
+      <ul class="saved-songs" id="saved-songs" aria-label="저장한 노래"></ul>
+      <p class="empty" id="saved-songs-empty">녹음한 노래를 저장하면 여기에 모여요.</p>
+    </div>
+  </div>
+  <div class="panel create-panel" id="story-play" hidden>
+    <h2>이야기 주사위</h2>
+    <p class="small">주사위를 굴려 누가, 어디서, 무엇을 했는지 정해요. 카드 하나만 눌러서 바꿀 수도 있어요.</p>
+    <div class="story-dice" id="story-dice"></div>
+    <p class="story-sentence" id="story-sentence" aria-live="polite"></p>
+    <div class="row story-actions">
+      <button class="button primary" id="story-roll" type="button">🎲 굴리기</button>
+      <button class="button" id="story-read" type="button">🔊 읽어 주기</button>
+      <button class="button" id="story-add" type="button">➕ 이야기에 넣기</button>
+      <button class="button" id="story-draw" type="button">🖍️ 그림으로 그리기</button>
+    </div>
+    <p class="feedback small" id="story-status" role="status"></p>
+    <div class="create-block">
+      <div class="section-head">
+        <h3>우리 이야기</h3>
+        <div class="row"><button class="button" id="story-read-all" type="button" disabled>📖 전체 듣기</button><button class="button" id="story-clear" type="button" disabled>새 이야기</button></div>
+      </div>
+      <ol class="story-strip" id="story-strip" aria-label="이야기 장면"></ol>
+      <p class="empty" id="story-empty">장면을 넣으면 그림책처럼 이어져요. 최대 4장면까지! 다음엔 어떻게 될지 같이 이야기해 봐요.</p>
+    </div>
   </div>
 </section>
 <section id="puzzle" hidden>
@@ -663,6 +795,26 @@ const ENGLISH_WORDS = [
 ];
 const LEARNING_PAGES = {hangul:'한글놀이','voice-cards':'내 목소리 카드',numbers:'숫자놀이',english:'영어놀이',thinking:'생각놀이',ebs:'EBS 영상'};
 const ART_ROUTES = {art:'trace-mode',paint:'free-mode',coloring:'coloring-mode',stickers:'sticker-art-mode'};
+const PAGE_ORDER = [...Object.entries(LEARNING_PAGES),['art','미술놀이'],['create','창작놀이'],['puzzle','퍼즐놀이'],['family','가족 대시보드'],['routine','오늘 할 일'],['voice-settings','부모 설정']];
+function renderPager(section) {
+  let pager = $('page-pager');
+  if (!pager) {
+    pager = element('nav','','page-pager');
+    pager.id = 'page-pager';
+    pager.setAttribute('aria-label','이전·다음 화면');
+  }
+  const index = PAGE_ORDER.findIndex(([key]) => key === section);
+  if (index < 0) { pager.remove(); return; }
+  const link = ([key,title],direction) => {
+    const node = element('a','',direction);
+    node.href = '#' + key;
+    node.append(element('span',direction === 'prev' ? '← 이전' : '다음 →'),element('strong',title));
+    node.setAttribute('aria-label',(direction === 'prev' ? '이전 화면: ' : '다음 화면: ') + title);
+    return node;
+  };
+  pager.replaceChildren(link(PAGE_ORDER[index - 1] || ['home','처음 화면'],'prev'),link(PAGE_ORDER[index + 1] || ['home','처음 화면'],'next'));
+  $(section).append(pager);
+}
 const STARTER_PLACES = [
   {title:'국립과천과학관',area:'과천',type:'실내',cost:'상설전시 7세 미만 무료',note:'전시를 보며 좋아하는 공룡이나 우주 이야기를 골라보세요.',url:'https://smart.sciencecenter.go.kr/gcsci/info/info_fee.php'},
   {title:'서울대공원 동물원',area:'과천',type:'야외',note:'가기 전에 계절별 운영 시간과 입장료를 공식 안내에서 확인하세요.',url:'https://grandpark.seoul.go.kr/conts/contsView.do?lang=ko&menu_id=S001001001001'}
@@ -681,7 +833,7 @@ function button(label, onClick, className = 'button') {
 }
 function showPage(focus) {
   const requested = location.hash.slice(1);
-  const sections = ['home','art','puzzle','family','routine','voice-settings',...Object.keys(LEARNING_PAGES)];
+  const sections = ['home','art','create','puzzle','family','routine','voice-settings',...Object.keys(LEARNING_PAGES)];
   const linkedSections = {memory:'puzzle',outings:'family'};
   const section = Object.hasOwn(linkedSections,requested) ? linkedSections[requested]
     : Object.hasOwn(ART_ROUTES,requested) ? 'art' : sections.includes(requested) ? requested : 'home';
@@ -691,6 +843,7 @@ function showPage(focus) {
     if (link.hash === '#' + section || learningMenu) link.setAttribute('aria-current','page');
     else link.removeAttribute('aria-current');
   });
+  renderPager(section);
   if (focus) { $(section).querySelector('h1').focus(); window.scrollTo(0,0); }
 }
 window.addEventListener('hashchange', () => showPage(true));
@@ -1085,6 +1238,14 @@ function nextQuestion() {
     if (subject === 'english' && !caption) choice.lang = 'en';
     return choice;
   }));
+  syncVoiceWord();
+}
+function syncVoiceWord() {
+  const select = $('voice-word');
+  if (subject !== 'hangul' || !mode?.recorded || activeRecording || !question?.answer) return;
+  if (select.value === question.answer || !Array.from(select.options).some((option) => option.value === question.answer)) return;
+  select.value = question.answer;
+  select.dispatchEvent(new Event('change'));
 }
 function changeMode(newMode,force = false) {
   if (!force && mode === newMode) return;
@@ -1143,7 +1304,7 @@ function openVoiceDatabase() {
 async function voiceData(action, word, blob) {
   const db = await openVoiceDatabase();
   return new Promise((resolve,reject) => {
-    const readOnly = action === 'get' || action === 'getAll';
+    const readOnly = action === 'get' || action === 'getAll' || action === 'getAllKeys';
     const tx = db.transaction('recordings', readOnly ? 'readonly' : 'readwrite');
     const recordings = tx.objectStore('recordings');
     const request = action === 'put' ? recordings.put(blob,word) : recordings[action](word);
@@ -1152,12 +1313,13 @@ async function voiceData(action, word, blob) {
     tx.onerror = () => reject(tx.error);
   });
 }
-async function playBlob(blob) {
+async function playBlob(blob, onDone) {
   const url = URL.createObjectURL(blob);
   const audio = new Audio(url);
   const release = () => {
     URL.revokeObjectURL(url);
     if (activeAudio?.audio === audio) activeAudio = null;
+    onDone?.();
   };
   activeAudio = {audio,release};
   audio.addEventListener('ended',release,{once:true});
@@ -1165,12 +1327,31 @@ async function playBlob(blob) {
   try { await audio.play(); } catch (err) { release(); throw err; }
 }
 WORDS.forEach(([word]) => $('voice-word').add(new Option(word,word)));
+syncVoiceWord();
+const recordedWords = new Set();
+function refreshWordOptions() {
+  for (const option of $('voice-word').options) option.textContent = (recordedWords.has(option.value) ? '🎙️ ' : '') + option.value;
+}
+function recordingMeter(panel) {
+  const meter = element('div','','rec-meter');
+  meter.hidden = true;
+  meter.setAttribute('aria-hidden','true');
+  const level = element('span','','rec-level');
+  for (let bar = 0; bar < 5; bar++) level.append(element('i'));
+  const progress = element('span','','rec-progress');
+  progress.append(element('span'));
+  const time = element('span','','rec-time');
+  meter.append(element('span','','rec-dot'),level,progress,time);
+  panel.querySelector('[data-record-status]').before(meter);
+  return {meter,time};
+}
 const recordingSettings = Array.from(document.querySelectorAll('[data-recording-panel]'), (panel) => {
   const kind = panel.dataset.feedbackVoice;
   const word = panel.querySelector('select');
   const collection = panel.id === 'voice-collection-recorder';
+  const {meter,time} = recordingMeter(panel);
   return {
-    kind, word, collection, section:panel.closest('section'),
+    kind, word, collection, panel, meter, meterTime:time, section:panel.closest('section'),
     start:panel.querySelector('[data-record-start]'),
     play:panel.querySelector('[data-record-play]'),
     remove:panel.querySelector('[data-record-delete]'),
@@ -1184,9 +1365,12 @@ function updateRecordingControls() {
   for (const setting of recordingSettings) {
     const recording = activeRecording?.setting === setting && activeRecording.media?.state === 'recording';
     const locked = Boolean(activeRecording) || setting.deleting;
-    const noClip = setting.kind && !feedbackClips.get(setting.kind);
+    const noClip = setting.kind ? !feedbackClips.get(setting.kind) : Boolean(setting.word) && !recordedWords.has(setting.word.value);
     const startLabel = recording ? '녹음 끝내기' : '녹음 시작';
-    setting.start.textContent = setting.collection && !recording ? '🎙️ ' + startLabel : startLabel;
+    setting.start.textContent = recording ? '⏹ ' + startLabel : setting.collection ? '🎙️ ' + startLabel : startLabel;
+    setting.start.classList.toggle('is-recording',recording);
+    setting.panel.classList.toggle('is-recording',recording);
+    setting.meter.hidden = !recording;
     if (setting.kind) setting.start.setAttribute('aria-label',setting.label() + ' ' + startLabel);
     setting.start.disabled = locked && !recording;
     if (setting.play) setting.play.disabled = Boolean(locked || noClip);
@@ -1196,6 +1380,9 @@ function updateRecordingControls() {
 }
 function closeRecordingStream(job) {
   clearTimeout(job.timeout);
+  cancelAnimationFrame(job.frame);
+  job.audioContext?.close().catch(() => {});
+  job.audioContext = undefined;
   job.stream?.getTracks().forEach((track) => track.stop());
   job.stream = undefined;
 }
@@ -1237,6 +1424,13 @@ async function recordVoice(setting) {
     if (activeRecording !== job) { finishRecording(job); return; }
     const media = new MediaRecorder(job.stream);
     job.media = media;
+    job.limit = setting.collection ? 15000 : 6000;
+    try {
+      job.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      job.analyser = job.audioContext.createAnalyser();
+      job.analyser.fftSize = 512;
+      job.audioContext.createMediaStreamSource(job.stream).connect(job.analyser);
+    } catch { job.analyser = undefined; }
     const pieces = [];
     media.ondataavailable = (event) => { if (event.data.size) pieces.push(event.data); };
     media.onerror = () => {
@@ -1250,30 +1444,57 @@ async function recordVoice(setting) {
       closeRecordingStream(job);
       updateRecordingControls();
       setting.status.textContent = '녹음을 저장하고 있어요.';
+      let playSaved;
       try {
         if (!pieces.length) throw new Error('Empty recording');
         const clip = new Blob(pieces,{type:pieces[0].type || media.mimeType});
         if (setting.collection) {
-          await saveVoiceCollectionCard(clip);
-          setting.status.textContent = '새 녹음 카드가 생겼어요!';
+          const play = await saveVoiceCollectionCard(clip);
+          playSaved = () => play.click();
+          setting.status.textContent = '새 카드가 생겼어요! 내 목소리를 들어 봐요.';
         } else {
           await voiceData('put',key,clip);
           if (setting.kind) feedbackClips.set(setting.kind,clip);
-          setting.status.textContent = '‘' + label + '’ 녹음을 저장했어요.';
+          else { recordedWords.add(key); refreshWordOptions(); }
+          playSaved = () => { stopAudio(); playBlob(clip).catch(() => {}); };
+          setting.status.textContent = '‘' + label + '’ 녹음을 저장했어요. 바로 들려줄게요.';
         }
       } catch {
         setting.status.textContent = '녹음을 저장하지 못했어요. 다시 시도해 주세요.';
       } finally { finishRecording(job); }
+      playSaved?.();
     };
     media.start();
+    job.startedAt = performance.now();
     updateRecordingControls();
-    setting.status.textContent = setting.collection ? '녹음 중이에요. 하고 싶은 말을 해요!' : '녹음 중이에요. ‘' + label + '’라고 말해 보세요.';
-    job.timeout = setTimeout(() => stopRecording(job),setting.collection ? 15000 : 6000);
+    trackRecording(job);
+    setting.status.textContent = setting.collection ? '듣고 있어요! 다 말하면 버튼을 한 번 더 눌러요.' : '듣고 있어요! ‘' + label + '’라고 말해 보세요.';
+    job.timeout = setTimeout(() => stopRecording(job),job.limit);
   } catch {
     if (activeRecording !== job) return;
     finishRecording(job);
     setting.status.textContent = '마이크를 열 수 없어요. 브라우저의 마이크 사용 권한을 확인해 주세요.';
   }
+}
+function trackRecording(job) {
+  const samples = job.analyser ? new Uint8Array(job.analyser.fftSize) : null;
+  const {meter,meterTime} = job.setting;
+  const tick = () => {
+    if (activeRecording !== job || job.media?.state !== 'recording') return;
+    let level = 0;
+    if (samples) {
+      job.analyser.getByteTimeDomainData(samples);
+      let peak = 0;
+      for (const sample of samples) peak = Math.max(peak,Math.abs(sample - 128));
+      level = Math.min(1,peak / 48);
+    }
+    const left = Math.max(0,job.limit - (performance.now() - job.startedAt));
+    meter.style.setProperty('--level',level.toFixed(2));
+    meter.style.setProperty('--progress',(1 - left / job.limit).toFixed(3));
+    meterTime.textContent = Math.ceil(left / 1000) + '초';
+    job.frame = requestAnimationFrame(tick);
+  };
+  tick();
 }
 async function previewVoice(setting) {
   if (activeRecording || setting.deleting) return;
@@ -1297,6 +1518,7 @@ async function deleteVoice(setting) {
   try {
     await voiceData('delete',setting.key());
     if (setting.kind) feedbackClips.set(setting.kind,undefined);
+    else if (setting.word) { recordedWords.delete(setting.key()); refreshWordOptions(); }
     setting.status.textContent = '녹음을 지웠어요.';
   } catch {
     setting.status.textContent = '녹음을 지우지 못했어요.';
@@ -1324,6 +1546,21 @@ window.addEventListener('hashchange', () => {
   if (activeRecording?.setting.section.hidden) cancelRecording();
 });
 window.addEventListener('pagehide', cancelRecording);
+const wordSetting = recordingSettings.find((setting) => setting.word);
+wordSetting.word.addEventListener('change',() => {
+  updateRecordingControls();
+  if (!activeRecording && !wordSetting.deleting) {
+    wordSetting.status.textContent = recordedWords.has(wordSetting.word.value)
+      ? '‘' + wordSetting.word.value + '’ 녹음이 있어요. 다시 녹음하면 새 소리로 바뀌어요.'
+      : '‘' + wordSetting.word.value + '’' + (hasBatchim(wordSetting.word.value) ? '은' : '는') + ' 아직 녹음이 없어요. 녹음 시작을 눌러요. (최대 6초)';
+  }
+});
+voiceData('getAllKeys').then((keys) => {
+  keys.forEach((key) => { if (typeof key === 'string' && !key.includes(':')) recordedWords.add(key); });
+  refreshWordOptions();
+  updateRecordingControls();
+  wordSetting.word.dispatchEvent(new Event('change'));
+}).catch(() => {});
 
 const VOICE_COLLECTION_PREFIX = 'voice-collection:';
 let voiceCollectionLoad;
@@ -1338,7 +1575,7 @@ async function saveVoiceCollectionCard(clip) {
   const key = VOICE_COLLECTION_PREFIX + crypto.randomUUID();
   const card = {key, clip, transcript:null, createdAt:Date.now()};
   await voiceData('put',key,card);
-  renderVoiceCollectionCard(card,true);
+  return renderVoiceCollectionCard(card,true);
 }
 async function saveVoiceTranscript(key, transcript, onlyIfEmpty) {
   const db = await openVoiceDatabase();
@@ -1385,12 +1622,18 @@ async function recogniseVoiceClip(clip) {
 }
 function renderVoiceCollectionCard(card, fresh = false) {
   const row = element('li','','voice-collection-item');
+  const stopPlaying = () => { play.classList.remove('playing'); symbol.textContent = '▶'; };
   const play = button('',async () => {
     if (activeRecording) return;
     stopAudio();
     const action = pendingAudioAction;
-    try { await playBlob(card.clip); }
-    catch { if (action === pendingAudioAction) message.textContent = '녹음을 재생하지 못했어요.'; }
+    play.classList.add('playing');
+    symbol.textContent = '🔊';
+    try { await playBlob(card.clip,stopPlaying); }
+    catch {
+      stopPlaying();
+      if (action === pendingAudioAction) message.textContent = '녹음을 재생하지 못했어요.';
+    }
   },'voice-collection-play');
   const symbol = element('span','▶','voice-play-icon');
   symbol.setAttribute('aria-hidden','true');
@@ -1458,7 +1701,7 @@ function renderVoiceCollectionCard(card, fresh = false) {
   });
   const retry = button('말을 글자로 바꾸기',transcribeCard);
   retry.hidden = card.transcript !== null;
-  const remove = button('삭제',async () => {
+  const remove = button('🗑️ 삭제',async () => {
     if (!window.confirm('이 녹음 카드를 삭제할까요?')) return;
     stopAudio();
     remove.disabled = true;
@@ -1471,16 +1714,30 @@ function renderVoiceCollectionCard(card, fresh = false) {
       remove.disabled = false;
     }
   });
+  remove.classList.add('danger');
+  edit.textContent = '✏️ 글자 고치기';
+  const tools = element('div','','row voice-card-tools');
+  tools.hidden = true;
+  tools.append(edit,remove);
+  const more = button('⋯ 고치기',() => {
+    tools.hidden = !tools.hidden;
+    more.setAttribute('aria-expanded',String(!tools.hidden));
+    if (tools.hidden) editForm.hidden = true;
+  });
+  more.setAttribute('aria-expanded','false');
+  more.setAttribute('aria-label','카드 고치기 메뉴');
   const actions = element('div','','row voice-card-actions');
-  actions.append(edit,retry,remove);
+  actions.append(retry,more);
   showTranscript();
-  row.append(play,actions,editForm,message);
+  row.append(play,actions,tools,editForm,message);
   const collection = $('my-voice-cards');
   if (fresh) {
+    row.classList.add('fresh');
     collection.prepend(row);
     transcribeCard();
   } else collection.append(row);
   updateVoiceCollectionCount();
+  return play;
 }
 function openVoiceCollection() {
   if (location.hash !== '#voice-cards' || voiceCollectionLoad) return;
@@ -2933,6 +3190,316 @@ window.addEventListener('hashchange',refreshRoutineDate);
 document.addEventListener('visibilitychange',refreshRoutineDate);
 setInterval(refreshRoutineDate,30000);
 refreshRoutineDate();
+const XYLOPHONE_NOTES = [
+  ['도',523.25,'#ff9aa8'],['레',587.33,'#ffb47a'],['미',659.25,'#ffd966'],['파',698.46,'#a6e38a'],
+  ['솔',783.99,'#7fd8c6'],['라',880,'#8cc2ff'],['시',987.77,'#b29cff'],['높은 도',1046.5,'#ffa3e2']
+];
+const FOLLOW_SONGS = [
+  {title:'반짝반짝 작은별',notes:[0,0,4,4,5,5,4,null,3,3,2,2,1,1,0]},
+  {title:'학교종',notes:[4,4,5,5,4,4,2,null,4,4,2,2,1,null,4,4,5,5,4,4,2,null,4,2,1,2,0]},
+  {title:'나비야',notes:[4,2,2,null,3,1,1,null,0,1,2,3,4,4,4]},
+  {title:'도레미 계단',notes:[0,1,2,3,4,5,6,7,null,7,6,5,4,3,2,1,0]}
+];
+const songsKey = 'family-playroom-songs';
+const xylophoneBars = [];
+let musicContext;
+let songTake;
+let lastSong;
+let followState;
+let songTimers = [];
+function playNote(index) {
+  const AudioEngine = window.AudioContext || window.webkitAudioContext;
+  if (!AudioEngine) { $('music-status').textContent = '이 브라우저에서는 소리를 낼 수 없어요.'; return; }
+  musicContext ||= new AudioEngine();
+  if (musicContext.state === 'suspended') musicContext.resume();
+  const now = musicContext.currentTime;
+  const frequency = XYLOPHONE_NOTES[index][1];
+  const volume = musicContext.createGain();
+  volume.gain.setValueAtTime(.0001,now);
+  volume.gain.exponentialRampToValueAtTime(.45,now + .006);
+  volume.gain.exponentialRampToValueAtTime(.0001,now + 1.3);
+  volume.connect(musicContext.destination);
+  const tone = musicContext.createOscillator();
+  tone.type = 'sine';
+  tone.frequency.value = frequency;
+  tone.connect(volume);
+  const ring = musicContext.createOscillator();
+  const ringVolume = musicContext.createGain();
+  ring.type = 'sine';
+  ring.frequency.value = frequency * 3.93;
+  ringVolume.gain.setValueAtTime(.18,now);
+  ringVolume.gain.exponentialRampToValueAtTime(.0001,now + .22);
+  ring.connect(ringVolume);
+  ringVolume.connect(volume);
+  tone.start(now); ring.start(now);
+  tone.stop(now + 1.35); ring.stop(now + .25);
+}
+function flashBar(index) {
+  const bar = xylophoneBars[index];
+  bar.classList.remove('hit');
+  void bar.offsetWidth;
+  bar.classList.add('hit');
+}
+function stopSongPlayback() {
+  songTimers.forEach(clearTimeout);
+  songTimers = [];
+}
+function playSequence(notes,onDone) {
+  stopSongPlayback();
+  notes.forEach(([index,time]) => songTimers.push(setTimeout(() => { playNote(index); flashBar(index); },time)));
+  const end = notes.length ? notes[notes.length - 1][1] + 900 : 0;
+  songTimers.push(setTimeout(() => { songTimers = []; onDone?.(); },end));
+}
+function timedSong(notes) {
+  let time = 0;
+  const timed = [];
+  for (const note of notes) {
+    if (note === null) { time += 320; continue; }
+    timed.push([note,time]);
+    time += 430;
+  }
+  return timed;
+}
+function readSongs() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(songsKey));
+    if (Array.isArray(saved)) return saved.filter((song) => typeof song?.name === 'string' && Array.isArray(song.notes)
+      && song.notes.every((note) => Array.isArray(note) && Number.isInteger(note[0]) && note[0] >= 0 && note[0] < XYLOPHONE_NOTES.length && Number.isFinite(note[1]) && note[1] >= 0));
+  } catch { /* Songs can still be played without browser storage. */ }
+  return [];
+}
+function renderSavedSongs() {
+  const songs = readSongs();
+  $('saved-songs').replaceChildren(...songs.map((song) => {
+    const item = element('li');
+    const play = button('▶ ' + song.name,() => {
+      $('music-status').textContent = '‘' + song.name + '’' + objectParticle(song.name) + ' 들려줄게요.';
+      playSequence(song.notes);
+    });
+    const remove = button('🗑️',() => {
+      if (!window.confirm('‘' + song.name + '’' + objectParticle(song.name) + ' 지울까요?')) return;
+      persist(songsKey,readSongs().filter((saved) => saved.id !== song.id),$('music-status'));
+      renderSavedSongs();
+    });
+    remove.setAttribute('aria-label',song.name + ' 지우기');
+    item.append(play,remove);
+    return item;
+  }));
+  $('saved-songs-empty').hidden = songs.length > 0;
+}
+function finishSongTake() {
+  if (!songTake) return;
+  clearTimeout(songTake.timeout);
+  const notes = songTake.notes;
+  songTake = undefined;
+  $('song-record').textContent = '⏺ 내 노래 녹음';
+  $('song-record').classList.remove('is-recording');
+  if (!notes.length) { $('music-status').textContent = '아무 막대도 치지 않았어요. 다시 해 볼까요?'; return; }
+  lastSong = notes;
+  $('song-replay').disabled = false;
+  $('song-save').disabled = false;
+  $('music-status').textContent = '음표 ' + notes.length + '개짜리 노래를 만들었어요! ‘다시 듣기’를 눌러 봐요.';
+}
+function renderFollow() {
+  xylophoneBars.forEach((bar) => bar.classList.remove('next'));
+  if (!followState) { $('follow-progress').textContent = ''; return; }
+  const {song,steps,position} = followState;
+  if (position >= steps.length) {
+    $('follow-progress').textContent = '🎉 ‘' + song.title + '’ 완성! 정말 잘 쳤어요.';
+    followState = undefined;
+    $('follow-start').textContent = '따라 치기 시작';
+    return;
+  }
+  xylophoneBars[steps[position]].classList.add('next');
+  $('follow-progress').textContent = song.title + ' · ' + (position + 1) + ' / ' + steps.length + ' · 반짝이는 ‘' + XYLOPHONE_NOTES[steps[position]][0] + '’' + (hasBatchim(XYLOPHONE_NOTES[steps[position]][0]) ? '을' : '를') + ' 쳐요.';
+}
+function tapBar(index) {
+  playNote(index);
+  flashBar(index);
+  if (songTake) {
+    songTake.notes.push([index,Math.round(performance.now() - songTake.startedAt)]);
+    if (songTake.notes.length >= 80) finishSongTake();
+  }
+  if (followState && followState.steps[followState.position] === index) {
+    followState.position++;
+    renderFollow();
+  }
+}
+XYLOPHONE_NOTES.forEach(([name,,color],index) => {
+  const bar = element('button',name,'xylo-bar');
+  bar.type = 'button';
+  bar.style.setProperty('--bar',color);
+  bar.style.setProperty('--h',(100 - index * 5) + '%');
+  bar.addEventListener('pointerdown',(event) => { event.preventDefault(); tapBar(index); });
+  bar.addEventListener('click',(event) => { if (event.detail === 0) tapBar(index); });
+  bar.addEventListener('animationend',() => bar.classList.remove('hit'));
+  xylophoneBars.push(bar);
+});
+$('xylophone').append(...xylophoneBars);
+FOLLOW_SONGS.forEach((song,index) => $('follow-song').add(new Option(song.title,index)));
+$('song-record').addEventListener('click',() => {
+  if (songTake) { finishSongTake(); return; }
+  stopSongPlayback();
+  songTake = {notes:[],startedAt:performance.now(),timeout:setTimeout(finishSongTake,30000)};
+  $('song-record').textContent = '⏹ 녹음 끝내기';
+  $('song-record').classList.add('is-recording');
+  $('music-status').textContent = '녹음 중이에요! 막대를 마음대로 쳐 봐요. (최대 30초)';
+});
+$('song-replay').addEventListener('click',() => {
+  if (!lastSong) return;
+  $('music-status').textContent = '방금 만든 노래를 들려줄게요.';
+  playSequence(lastSong);
+});
+$('song-save').addEventListener('click',() => {
+  if (!lastSong) return;
+  const songs = readSongs();
+  const name = '내 노래 ' + (songs.reduce((max,song) => Math.max(max,Number(song.name.replace(/\D/g,'')) || 0),0) + 1);
+  const next = [...songs,{id:Date.now().toString(36),name,notes:lastSong}].slice(-8);
+  if (persist(songsKey,next,$('music-status'))) {
+    $('music-status').textContent = '‘' + name + '’' + objectParticle(name) + ' 저장했어요. 노래는 8곡까지 모여요.';
+    $('song-save').disabled = true;
+    renderSavedSongs();
+  }
+});
+$('follow-listen').addEventListener('click',() => {
+  const song = FOLLOW_SONGS[$('follow-song').value];
+  $('music-status').textContent = '‘' + song.title + '’' + objectParticle(song.title) + ' 먼저 들어 봐요.';
+  playSequence(timedSong(song.notes));
+});
+$('follow-start').addEventListener('click',() => {
+  stopSongPlayback();
+  const song = FOLLOW_SONGS[$('follow-song').value];
+  followState = {song,steps:song.notes.filter((note) => note !== null),position:0};
+  $('follow-start').textContent = '처음부터 다시';
+  renderFollow();
+});
+$('follow-song').addEventListener('change',() => {
+  if (!followState) return;
+  followState = undefined;
+  $('follow-start').textContent = '따라 치기 시작';
+  renderFollow();
+});
+document.addEventListener('keydown',(event) => {
+  if ($('create').hidden || $('music-play').hidden || event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
+  if (event.target.closest('input,select,textarea')) return;
+  const index = '12345678'.indexOf(event.key);
+  if (index >= 0) { event.preventDefault(); tapBar(index); }
+});
+
+const STORY_WHO = [['토끼','🐰'],['공룡','🦖'],['고양이','🐱'],['펭귄','🐧'],['곰','🐻'],['로봇','🤖'],['공주','👸'],['우주인','🧑‍🚀'],['문어','🐙'],['코끼리','🐘'],['강아지','🐶'],['다람쥐','🐿️'],['용','🐉'],['거북이','🐢']];
+const STORY_WHERE = [['바닷가','🏖️'],['숲속','🌲'],['우주','🪐'],['놀이터','🛝'],['구름 위','☁️'],['바다 속','🐠'],['부엌','🍳'],['동물원','🦒'],['눈 나라','⛄'],['기차 안','🚂'],['성','🏰'],['꽃밭','🌼']];
+const STORY_WHAT = [['케이크를 만들었어요','🎂','케이크 만들기'],['춤을 췄어요','💃','춤추기'],['보물을 찾았어요','💎','보물찾기'],['노래를 불렀어요','🎤','노래하기'],['새 친구를 만났어요','🤝','친구 만나기'],['낮잠을 잤어요','😴','낮잠 자기'],['풍선을 날렸어요','🎈','풍선 날리기'],['그림을 그렸어요','🎨','그림 그리기'],['숨바꼭질을 했어요','🙈','숨바꼭질'],['아이스크림을 먹었어요','🍦','아이스크림 먹기'],['로켓을 탔어요','🚀','로켓 타기'],['선물을 받았어요','🎁','선물 받기'],['비눗방울을 불었어요','🫧','비눗방울 불기'],['방귀를 뀌었어요','💨','방귀 뀌기']];
+const STORY_KINDS = [['누가',STORY_WHO],['어디서',STORY_WHERE],['무엇을 했나',STORY_WHAT]];
+const STORY_LINKS = ['옛날 옛날에, ','그다음에 ','그런데 갑자기 ','마지막으로 '];
+const storyPick = [0,0,0];
+const storyScenes = [];
+const storyDice = [];
+function objectParticle(word) { return hasBatchim(word) ? '을' : '를'; }
+function hasBatchim(word) {
+  if (/\d$/.test(word)) return '013678'.includes(word.slice(-1));
+  const code = word.charCodeAt(word.length - 1) - 0xac00;
+  return code >= 0 && code <= 11171 && code % 28 !== 0;
+}
+function storySentence(pick = storyPick) {
+  const who = STORY_WHO[pick[0]][0];
+  return who + (hasBatchim(who) ? '이 ' : '가 ') + STORY_WHERE[pick[1]][0] + '에서 ' + STORY_WHAT[pick[2]][0] + '.';
+}
+function renderStoryDie(index) {
+  const [kind,list] = STORY_KINDS[index];
+  const [word,icon] = list[storyPick[index]];
+  const die = storyDice[index];
+  const iconNode = element('span',icon,'die-icon');
+  iconNode.setAttribute('aria-hidden','true');
+  const shown = list[storyPick[index]][2] || word;
+  die.replaceChildren(element('span',kind,'die-kind'),iconNode,element('span',shown,'die-word'));
+  die.setAttribute('aria-label',kind + ': ' + shown + ' (눌러서 바꾸기)');
+}
+function renderStorySentence() {
+  $('story-sentence').textContent = storySentence();
+}
+function rollStory(indices) {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  for (const index of indices) {
+    const list = STORY_KINDS[index][1];
+    let next = Math.floor(Math.random() * list.length);
+    if (next === storyPick[index]) next = (next + 1) % list.length;
+    if (reduced) { storyPick[index] = next; renderStoryDie(index); continue; }
+    const die = storyDice[index];
+    die.classList.remove('rolling');
+    void die.offsetWidth;
+    die.classList.add('rolling');
+    let spins = 0;
+    const spin = setInterval(() => {
+      storyPick[index] = ++spins >= 6 ? next : Math.floor(Math.random() * list.length);
+      renderStoryDie(index);
+      if (spins >= 6) { clearInterval(spin); renderStorySentence(); }
+    },90);
+  }
+  if (reduced) renderStorySentence();
+  $('story-status').textContent = '';
+}
+function renderStoryBook() {
+  $('story-strip').replaceChildren(...storyScenes.map((pick,index) => {
+    const item = element('li');
+    const icons = element('div',STORY_KINDS.map(([,list],kind) => list[pick[kind]][1]).join(' '),'scene-icons');
+    icons.setAttribute('aria-hidden','true');
+    item.append(icons,element('p',STORY_LINKS[index] + storySentence(pick)));
+    return item;
+  }));
+  $('story-empty').hidden = storyScenes.length > 0;
+  $('story-read-all').disabled = !storyScenes.length;
+  $('story-clear').disabled = !storyScenes.length;
+  $('story-add').disabled = storyScenes.length >= STORY_LINKS.length;
+}
+STORY_KINDS.forEach((kind,index) => {
+  const die = button('',() => rollStory([index]),'story-die');
+  storyDice.push(die);
+  storyPick[index] = Math.floor(Math.random() * kind[1].length);
+  renderStoryDie(index);
+});
+$('story-dice').append(...storyDice);
+renderStorySentence();
+renderStoryBook();
+function speakStory(text) {
+  if (activeRecording) return;
+  stopAudio();
+  if (!speakLocal(text)) $('story-status').textContent = '이 기기에서 한국어 음성을 찾지 못했어요. 엄마 아빠가 읽어 주세요!';
+}
+$('story-roll').addEventListener('click',() => rollStory([0,1,2]));
+$('story-read').addEventListener('click',() => speakStory(storySentence()));
+$('story-add').addEventListener('click',() => {
+  if (storyScenes.length >= STORY_LINKS.length) return;
+  storyScenes.push([...storyPick]);
+  renderStoryBook();
+  $('story-status').textContent = storyScenes.length < STORY_LINKS.length
+    ? storyScenes.length + '번째 장면을 넣었어요. 다음엔 무슨 일이 생길까요? 주사위를 굴려 봐요!'
+    : '이야기가 완성됐어요! ‘전체 듣기’로 들어 봐요.';
+});
+$('story-read-all').addEventListener('click',() => speakStory(storyScenes.map((pick,index) => STORY_LINKS[index] + storySentence(pick)).join(' ') + ' 끝!'));
+$('story-clear').addEventListener('click',() => {
+  storyScenes.length = 0;
+  renderStoryBook();
+  $('story-status').textContent = '새 이야기를 시작해요.';
+});
+$('story-draw').addEventListener('click',() => {
+  $('art-prompt').textContent = storySentence() + ' 이 장면을 그려 볼까?';
+  location.hash = 'paint';
+});
+function showCreateMode(music) {
+  $('music-play').hidden = !music;
+  $('story-play').hidden = music;
+  $('music-mode').setAttribute('aria-pressed',String(music));
+  $('story-mode').setAttribute('aria-pressed',String(!music));
+  if (!music) { stopSongPlayback(); finishSongTake(); }
+}
+$('music-mode').addEventListener('click',() => showCreateMode(true));
+$('story-mode').addEventListener('click',() => showCreateMode(false));
+renderSavedSongs();
+window.addEventListener('hashchange',() => {
+  if (!$('create').hidden) return;
+  stopSongPlayback();
+  finishSongTake();
+});
 </script>
 </body>
 </html>
