@@ -165,6 +165,9 @@ p { line-height:1.65; }
 .position-tiles { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; width:min(100%,230px); }
 .position-tiles .thinking-tile { min-height:34px; font-size:1.65rem; }
 .feedback { min-height:30px; margin:13px 0 5px; font-weight:700; }
+.card-nav { gap:12px; margin-top:6px; }
+.card-nav .button { min-width:128px; }
+.card-count { min-width:4.5em; color:var(--muted); font-size:.9rem; font-weight:800; font-variant-numeric:tabular-nums; }
 details { margin-top:18px; }
 summary { cursor:pointer; font-weight:760; border-radius:12px; }
 .field { display:grid; gap:6px; min-width:0; }
@@ -377,6 +380,9 @@ footer { padding:0 0 28px; color:#5a5574; font-size:.9rem; }
   .animal-picker { grid-template-columns:repeat(var(--animal-count,4),minmax(0,1fr)); }
   .game-toolbar { justify-content:center; }
   .options { gap:10px; }
+  .card-nav { gap:8px; }
+  .card-nav .button { min-width:0; flex:1 1 0; padding-inline:10px; }
+  .card-count { order:-1; width:100%; text-align:center; }
   .puzzle-content { grid-template-columns:1fr; gap:10px; }
   .puzzle-example { display:flex; align-items:center; gap:8px; }
   .puzzle-example img { order:-1; width:94px; margin:0; }
@@ -440,7 +446,7 @@ footer { padding:0 0 28px; color:#5a5574; font-size:.9rem; }
     <button class="button" type="button" id="listen">소리 듣기</button>
     <div class="options" id="options"></div>
     <p class="feedback" id="feedback" role="status"></p>
-    <button class="button primary" type="button" id="next">다음 카드</button>
+    <div class="row card-nav"><button class="button" type="button" id="previous-card" disabled>← 이전 카드</button><span class="card-count" id="card-count" aria-live="polite"></span><button class="button primary" type="button" id="next">다음 카드 →</button></div>
   </div>
   </div>
   <details class="panel" data-recording-panel>
@@ -530,13 +536,14 @@ footer { padding:0 0 28px; color:#5a5574; font-size:.9rem; }
     <p id="trace-status" class="trace-status" role="status"></p>
     <div class="trace-reward" id="trace-reward" hidden></div>
     <div class="row trace-actions">
+      <button class="button" id="trace-previous" type="button">← 이전 동물</button>
       <button class="button" id="trace-reset" type="button" disabled>다시 그리기</button>
-      <button class="button primary" id="trace-next" type="button" hidden>다음 동물</button>
+      <button class="button" id="trace-next" type="button">다음 동물 →</button>
     </div>
   </div>
   <div class="panel art-activity" id="free-art" hidden>
     <h2>페인트 그림판</h2>
-    <div class="section-head"><p id="art-prompt">알록달록한 사과를 그려볼까?</p><button class="button" id="idea" type="button">다른 그리기 주제</button></div>
+    <div class="section-head"><p id="art-prompt">알록달록한 사과를 그려볼까?</p><div class="row"><button class="button" id="idea-previous" type="button">← 이전 주제</button><button class="button" id="idea" type="button">다음 주제 →</button></div></div>
     <div class="paint-toolset" id="paint-tools" aria-label="물감 도구"></div>
     <div class="paint-toolset" id="paint-widths" aria-label="붓 굵기"></div>
     <div class="row art-tools">
@@ -548,7 +555,7 @@ footer { padding:0 0 28px; color:#5a5574; font-size:.9rem; }
   </div>
   <div class="panel art-activity" id="coloring-art" hidden>
     <h2>색칠하기</h2><p class="small">색을 고르고 그림 속 칸을 눌러요.</p>
-    <div class="row"><label for="coloring-choices">그림 고르기</label><select id="coloring-choices"></select><button class="button" id="coloring-next" type="button">다른 그림</button></div>
+    <div class="row"><label for="coloring-choices">그림 고르기</label><select id="coloring-choices"></select><button class="button" id="coloring-previous" type="button">← 이전 그림</button><button class="button" id="coloring-next" type="button">다음 그림 →</button></div>
     <div class="row art-palette" id="coloring-palette" aria-label="색칠할 색"></div>
     <svg id="coloring-board" class="art-stage" viewBox="0 0 400 300" role="group" aria-label="색칠 그림판"></svg>
     <p id="coloring-status" class="feedback" role="status"></p>
@@ -633,7 +640,7 @@ footer { padding:0 0 28px; color:#5a5574; font-size:.9rem; }
     <div class="row puzzle-settings">
       <button class="button" id="picture-easy" type="button" aria-pressed="true">4조각</button><button class="button" id="picture-middle" type="button" aria-pressed="false">6조각</button><button class="button" id="picture-hard" type="button" aria-pressed="false">9조각</button><button class="button" id="picture-expert" type="button" aria-pressed="false">16조각</button>
       <label class="field" for="puzzle-scene">그림 고르기</label><select id="puzzle-scene"></select>
-      <button class="button" id="picture-next" type="button">다른 그림</button>
+      <button class="button" id="picture-previous" type="button">← 이전 그림</button><button class="button" id="picture-next" type="button">다음 그림 →</button>
       <button class="button" id="picture-restart" type="button">다시 섞기</button>
     </div>
     <div class="puzzle-content">
@@ -1200,13 +1207,28 @@ function chooseGameOption(label,choice) {
   feedback.textContent = story ? question.completePrompt || '이야기를 완성했어요! ⭐' : '맞았어요! ' + label + ' ⭐';
   $('options').querySelectorAll('button').forEach((option) => { option.disabled = option !== choice || Boolean(story); });
 }
+let cardHistory = [];
+let cardPosition = -1;
 function nextQuestion() {
-  stopAudio();
+  if (cardPosition < cardHistory.length - 1) { showQuestion(cardHistory[++cardPosition]); return; }
   if (!deck.length) {
     deck = shuffled(mode.cards);
     if (deck[0] === question) deck.push(deck.shift());
   }
-  question = deck.shift();
+  cardHistory.push(deck.shift());
+  if (cardHistory.length > 60) cardHistory.shift();
+  cardPosition = cardHistory.length - 1;
+  showQuestion(cardHistory[cardPosition]);
+}
+function previousQuestion() {
+  if (cardPosition <= 0) return;
+  showQuestion(cardHistory[--cardPosition]);
+}
+function showQuestion(card) {
+  stopAudio();
+  question = card;
+  $('previous-card').disabled = cardPosition <= 0;
+  $('card-count').textContent = (cardPosition + 1) + '번째 카드';
   solved = false;
   storyStep = 0;
   $('prompt').textContent = question.steps ? question.firstPrompt ? question.title : question.title + ' · 순서대로 골라요.' : mode.prompt;
@@ -1251,6 +1273,8 @@ function changeMode(newMode,force = false) {
   if (!force && mode === newMode) return;
   mode = newMode;
   deck = [];
+  cardHistory = [];
+  cardPosition = -1;
   Array.from($('game-modes').children).forEach((option,index) => {
     option.setAttribute('aria-pressed',GAME_MODES[subject][index] === mode);
   });
@@ -1284,6 +1308,13 @@ $('listen').addEventListener('click', () => {
   listen(text,Boolean(mode.recorded),$('feedback'),subject === 'english' ? 'en-US' : 'ko-KR');
 });
 $('next').addEventListener('click', nextQuestion);
+$('previous-card').addEventListener('click', previousQuestion);
+document.addEventListener('keydown',(event) => {
+  if (!Object.hasOwn(GAME_MODES,location.hash.slice(1)) || event.ctrlKey || event.metaKey || event.altKey) return;
+  if (event.target.closest('input,select,textarea,details')) return;
+  if (event.key === 'ArrowRight') { event.preventDefault(); nextQuestion(); }
+  if (event.key === 'ArrowLeft') { event.preventDefault(); previousQuestion(); }
+});
 window.addEventListener('hashchange',showLearningGame);
 showPage(false);
 renderPlayerName();
@@ -2036,7 +2067,7 @@ function renderTrace() {
   renderTraceReward(complete);
   $('trace-count').textContent = '완성 ' + finishedAnimals.size + ' / ' + ANIMALS.length;
   $('trace-reset').disabled = state.part === 0 && state.sample === 0;
-  $('trace-next').hidden = !complete;
+  $('trace-next').classList.toggle('primary',complete);
 }
 
 function tracePoint(event) {
@@ -2118,9 +2149,9 @@ $('trace-reset').addEventListener('click',() => {
 });
 $('trace-next').addEventListener('click',() => {
   const indices = ANIMALS.map((_,offset) => (animalIndex + offset + 1) % ANIMALS.length);
-  mountAnimal(indices.find((index) => !finishedAnimals.has(index)) ?? indices[0]);
-  $('animal-picker').children[animalIndex].focus();
+  mountAnimal(traceBoard.classList.contains('done') ? indices.find((index) => !finishedAnimals.has(index)) ?? indices[0] : indices[0]);
 });
+$('trace-previous').addEventListener('click',() => mountAnimal((animalIndex - 1 + ANIMALS.length) % ANIMALS.length));
 const ART_MODES = {'trace-mode':'trace-game','coloring-mode':'coloring-art','sticker-art-mode':'sticker-art','free-mode':'free-art'};
 function showArtMode(mode) {
   for (const [key,section] of Object.entries(ART_MODES)) {
@@ -2253,6 +2284,7 @@ PAINT_WIDTHS.forEach(([width,label],index) => {
 pressedOnly($('paint-tools'),0);
 pressedOnly($('paint-widths'),1);
 $('idea').addEventListener('click', () => { ideaIndex = (ideaIndex + 1) % IDEAS.length; $('art-prompt').textContent = IDEAS[ideaIndex]; });
+$('idea-previous').addEventListener('click', () => { ideaIndex = (ideaIndex - 1 + IDEAS.length) % IDEAS.length; $('art-prompt').textContent = IDEAS[ideaIndex]; });
 $('undo').addEventListener('click', () => { strokes.pop(); paint(); drawingButtons(); $('paint-export').textContent = ''; });
 $('clear').addEventListener('click', () => { if (confirm('그림을 모두 지울까요?')) { strokes.length = 0; paint(); drawingButtons(); $('paint-export').textContent = ''; } });
 $('save-art').addEventListener('click', () => {
@@ -2483,6 +2515,7 @@ function openColoring(index) {
 COLORING_PAGES.forEach(({name},index) => $('coloring-choices').add(new Option(name,index)));
 $('coloring-choices').addEventListener('change',() => openColoring(Number($('coloring-choices').value)));
 $('coloring-next').addEventListener('click',() => openColoring((coloringIndex + 1) % COLORING_PAGES.length));
+$('coloring-previous').addEventListener('click',() => openColoring((coloringIndex - 1 + COLORING_PAGES.length) % COLORING_PAGES.length));
 ART_COLORS.forEach(([name,color],index) => {
   const choice = button('',() => {
     coloringColor = index;
@@ -2647,8 +2680,8 @@ PUZZLE_PICTURES.forEach(({name},index) => $('puzzle-scene').add(new Option(name,
 for (const [id,size] of Object.entries(PICTURE_SIZES)) $(id).addEventListener('click',() => startPicture(size));
 $('picture-restart').addEventListener('click',() => startPicture(pictureSize));
 $('puzzle-scene').addEventListener('change',() => startPicture(pictureSize));
-$('picture-next').addEventListener('click',() => {
-  $('puzzle-scene').value = String((Number($('puzzle-scene').value) + 1) % PUZZLE_PICTURES.length);
+for (const [id,step] of [['picture-next',1],['picture-previous',-1]]) $(id).addEventListener('click',() => {
+  $('puzzle-scene').value = String((Number($('puzzle-scene').value) + step + PUZZLE_PICTURES.length) % PUZZLE_PICTURES.length);
   startPicture(pictureSize);
 });
 startPicture(pictureSize);
